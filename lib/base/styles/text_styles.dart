@@ -13,4 +13,5 @@ class TextStyles {
     fontSize: 18,
     fontWeight: FontWeight.w500,
   );
+  static const TextStyle userTitle = TextStyle(fontWeight: FontWeight.w600);
 }

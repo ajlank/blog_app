@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:blog_app/controller/profile_settings_notifier.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
+import 'package:provider/provider.dart';
 
 class ProfileSettings extends StatefulWidget {
   const ProfileSettings({super.key});
@@ -81,17 +83,14 @@ class _ProfileSettingsState extends State<ProfileSettings> {
         profileImageUrl = await uploadToCloudinary(profile!);
       }
 
-      final data = await FirebaseFirestore.instance
-          .collection("profilesettings")
-          .add({
-            "userId": FirebaseAuth.instance.currentUser!.uid,
-            "name": _titleController.text.trim(),
-            "about": _aboutController.text.trim(),
-            "postedAt": FieldValue.serverTimestamp(),
-            "profileImageUrl": profileImageUrl ?? "",
-            "coverImageUrl": coverImageUrl ?? "",
-          });
-      print(data.id);
+      await FirebaseFirestore.instance.collection("profilesettings").add({
+        "userId": FirebaseAuth.instance.currentUser!.uid,
+        "name": _titleController.text.trim(),
+        "about": _aboutController.text.trim(),
+        "postedAt": FieldValue.serverTimestamp(),
+        "profileImageUrl": profileImageUrl ?? "",
+        "coverImageUrl": coverImageUrl ?? "",
+      });
     } catch (e) {
       print(e);
     }

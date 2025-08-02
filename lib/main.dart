@@ -1,3 +1,4 @@
+import 'package:blog_app/controller/profile_settings_notifier.dart';
 import 'package:blog_app/firebase_options.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
 import 'package:blog_app/views/auth_views/login_view.dart';
@@ -10,6 +11,7 @@ import 'package:cloudinary_url_gen/cloudinary.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +19,14 @@ void main() async {
     cloudName: 'dyn1z1hjj',
   );
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ProfileSettingsNotifier()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

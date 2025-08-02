@@ -33,7 +33,8 @@ class _LoginViewState extends State<LoginView> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      print(userCred);
+
+      print(userCred.user);
     } on FirebaseAuthException catch (e) {
       print(e.message);
     }

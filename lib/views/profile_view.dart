@@ -1,9 +1,11 @@
 import 'package:blog_app/base/styles/text_styles.dart';
+import 'package:blog_app/controller/profile_settings_notifier.dart';
 import 'package:blog_app/customs/custom_clipper.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -22,7 +24,11 @@ class ProfileView extends StatelessWidget {
           }
           if (snapshot.hasData) {
             final docs = snapshot.data!.docs;
-            final profileData = docs.first.data() as Map<String, dynamic>;
+            final profileData = docs.first.data();
+            context.read<ProfileSettingsNotifier>().setUserDetals(
+              profileData['profileImageUrl'],
+              profileData['name'],
+            );
             return CustomScrollView(
               slivers: [
                 SliverAppBar(
@@ -146,7 +152,7 @@ class ProfileView extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              profileData['name'],
+                              profileData['name'] ?? 'Your name',
                               style: TextStyles.profileHeaderText,
                             ),
                           ],
