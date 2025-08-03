@@ -1,6 +1,7 @@
 import 'package:blog_app/utils/constants/app_routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -33,7 +34,6 @@ class _LoginViewState extends State<LoginView> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-
       print(userCred.user);
     } on FirebaseAuthException catch (e) {
       print(e.message);
@@ -42,6 +42,7 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
+    final userConfirmed = GetStorage().read("userConfirmId");
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -62,6 +63,9 @@ class _LoginViewState extends State<LoginView> {
             TextButton(
               onPressed: () async {
                 await loginUser();
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(homeRoute, (_) => false);
               },
               child: const Text('Login'),
             ),

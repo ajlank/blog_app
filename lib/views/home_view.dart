@@ -1,6 +1,8 @@
 import 'package:blog_app/base/styles/text_styles.dart';
+import 'package:blog_app/controller/post_comment_notifier.dart';
 import 'package:blog_app/controller/profile_settings_notifier.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +31,7 @@ class HomeView extends StatelessWidget {
           ),
           IconButton(
             onPressed: () {
-              Navigator.of(context).pushNamed(profileSettingsRoute);
+              // Navigator.of(context).pushNamed(profileSettingsRoute);
             },
             icon: Icon(FluentIcons.settings_16_filled),
           ),
@@ -37,158 +39,402 @@ class HomeView extends StatelessWidget {
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
               context.read<ProfileSettingsNotifier>().clearUserDetails();
+              Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil(loginRoute, (_) => false);
             },
             icon: Icon(FluentIcons.arrow_exit_20_filled),
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(7.2),
-            child: Column(
-              children: [
-                Container(
-                  width: size.width * 0.93,
-                  margin: EdgeInsets.only(bottom: 12),
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance.collection('posts').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: Text('Loading'));
+          }
+          if (snapshot.hasData) {
+            final docs = snapshot.data!.docs;
+            return ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: docs.length,
+              itemBuilder: (context, index) {
+                final postData = docs[index].data();
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
                     color: const Color.fromARGB(255, 254, 251, 251),
                     borderRadius: BorderRadius.circular(30),
                   ),
+                  padding: const EdgeInsets.all(12),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 10),
-                      Container(
-                        margin: EdgeInsets.only(bottom: 12),
-                        width: size.width * .8,
-                        child: Wrap(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 12.0),
-                                      child: CircleAvatar(radius: 24),
-                                    ),
-                                    SizedBox(width: 9),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Azunyan U. Wu',
-                                          style: TextStyles.userTitle,
-                                        ),
-                                        Text(
-                                          'Posted 3m ago',
-                                          style: TextStyles.profileHeaderText
-                                              .copyWith(
-                                                fontWeight: FontWeight.w300,
-                                                fontSize: 13,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: NetworkImage(
+                              postData['userImageUrl'] ?? '',
+                            ),
+                            radius: 24,
+                          ),
+                          const SizedBox(width: 9),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                postData['userName'] ?? '',
+                                style: TextStyles.userTitle,
+                              ),
+                              Text(
+                                'Posted just now', // You can later use Timestamp to calculate time ago
+                                style: TextStyles.profileHeaderText.copyWith(
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 13,
                                 ),
-                                PopupMenuButton<MenuAction>(
-                                  onSelected: (value) {
-                                    print(value);
-                                  },
-                                  itemBuilder: (context) {
-                                    return [
-                                      PopupMenuItem<MenuAction>(
-                                        value: MenuAction.delete,
-                                        child: Text('Delete'),
-                                      ),
-                                    ];
-                                  },
-                                ),
-                              ],
-                            ),
-
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                top: 7.0,
-                                left: 1.0,
                               ),
-                              child: Text(
-                                // maxLines: 100, //modify for specific user
-                                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                              ),
-                            ),
-
-                            !(1 > 2)
-                                ? Padding(
-                                    padding: const EdgeInsets.only(top: 12),
-                                    child: ClipRRect(
-                                      clipBehavior: Clip.antiAlias,
-                                      borderRadius:
-                                          BorderRadiusGeometry.circular(16),
-                                      child: Image.network(
-                                        'https://tse3.mm.bing.net/th/id/OIP.L_wr5vbGvq_E1sIRrx5dUwHaEo?pid=Api&P=0&h=220',
-                                      ),
-                                    ),
-                                  )
-                                : SizedBox(),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 11),
-                              child: Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      print('reactions');
-                                    },
-                                    child: Row(
-                                      children: [
-                                        Icon(FluentIcons.heart_16_regular),
-                                        SizedBox(width: 5),
-                                        Text('574'),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(width: 17),
-                                  GestureDetector(
-                                    onTap: () {
-                                      print('commented');
-                                    },
-                                    child: Row(
-                                      children: [
-                                        Icon(FluentIcons.comment_28_regular),
-                                        SizedBox(width: 5),
-                                        Text('450'),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        postData['userPostText'] ?? '',
+                        style: TextStyles.profileHeaderText.copyWith(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
-                      Text(
-                        context
-                            .watch<ProfileSettingsNotifier>()
-                            .userName
-                            .toString(),
-                      ),
-
-                      Image.network(
-                        context
-                            .watch<ProfileSettingsNotifier>()
-                            .profileImageUrl,
+                      if ((postData['postImageUrl'] ?? '').isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.network(postData['postImageUrl']),
+                          ),
+                        ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {},
+                            child: Icon(FluentIcons.heart_16_regular),
+                          ),
+                          const SizedBox(width: 5),
+                          Text('74'), // Replace with real count
+                          const SizedBox(width: 17),
+                          GestureDetector(
+                            onTap: () async {
+                              context.read<PostCommentNotifier>().setDocId(
+                                postData['documentId'],
+                              );
+                              showCommentsSheet(
+                                context,
+                                Provider.of<PostCommentNotifier>(
+                                  context,
+                                  listen: false,
+                                ).docId,
+                              );
+                            },
+                            child: Icon(FluentIcons.comment_28_regular),
+                          ),
+                          const SizedBox(width: 5),
+                          Text('20'),
+                        ],
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-          ),
-        ),
+                );
+              },
+            );
+          }
+
+          return Center(child: Text('Loading'));
+        },
       ),
     );
   }
 }
+
+void showCommentsSheet(BuildContext context, String postId) {
+  final TextEditingController commentController = TextEditingController();
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      return Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              height: 5,
+              width: 40,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('posts')
+                    .doc(postId)
+                    .collection('comments')
+                    .orderBy('timestamp', descending: true)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final comments = snapshot.data!.docs;
+
+                  if (comments.isEmpty) {
+                    return const Center(child: Text("No comments yet."));
+                  }
+
+                  return ListView.builder(
+                    itemCount: comments.length,
+                    itemBuilder: (context, index) {
+                      final comment = comments[index];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: NetworkImage(comment['userImage']),
+                        ),
+                        title: Text(comment['userName']),
+                        subtitle: Text(comment['commentText']),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 10,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: commentController,
+                      decoration: const InputDecoration(
+                        hintText: "Add a comment...",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.send, color: Colors.blue),
+                    onPressed: () async {
+                      final text = commentController.text;
+                      if (text.isNotEmpty) {
+                        await FirebaseFirestore.instance
+                            .collection('posts')
+                            .doc(postId)
+                            .collection('comments')
+                            .add({
+                              'userId': FirebaseAuth.instance.currentUser!.uid,
+                              'userName': Provider.of<ProfileSettingsNotifier>(
+                                context,
+                                listen: false,
+                              ).userName,
+                              'userImage': Provider.of<ProfileSettingsNotifier>(
+                                context,
+                                listen: false,
+                              ).profileImageUrl,
+                              'commentText': text,
+                              'timestamp': FieldValue.serverTimestamp(),
+                            });
+
+                        commentController.clear(); // Clear input field
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+
+
+          // if (snapshot.hasData) {
+          //   final docs = snapshot.data!.docs;
+          //   final postData = docs.first.data();
+          //   return Padding(
+          //     padding: const EdgeInsets.all(8.0),
+          //     child: SingleChildScrollView(
+          //       child: Padding(
+          //         padding: const EdgeInsets.all(7.2),
+          //         child: Column(
+          //           children: [
+          //             Container(
+          //               width: size.width * 0.93,
+          //               margin: EdgeInsets.only(bottom: 12),
+          //               decoration: BoxDecoration(
+          //                 color: const Color.fromARGB(255, 254, 251, 251),
+          //                 borderRadius: BorderRadius.circular(30),
+          //               ),
+          //               child: Column(
+          //                 children: [
+          //                   SizedBox(height: 10),
+          //                   Container(
+          //                     margin: EdgeInsets.only(bottom: 12),
+          //                     width: size.width * .8,
+          //                     child: Wrap(
+          //                       children: [
+          //                         Row(
+          //                           mainAxisAlignment:
+          //                               MainAxisAlignment.spaceBetween,
+          //                           children: [
+          //                             Row(
+          //                               children: [
+          //                                 Padding(
+          //                                   padding: const EdgeInsets.only(
+          //                                     top: 12.0,
+          //                                   ),
+          //                                   child: CircleAvatar(
+          //                                     backgroundImage: NetworkImage(
+          //                                       postData['userImageUrl'] ?? '',
+          //                                     ),
+          //                                     radius: 24,
+          //                                   ),
+          //                                 ),
+          //                                 SizedBox(width: 9),
+          //                                 Column(
+          //                                   crossAxisAlignment:
+          //                                       CrossAxisAlignment.start,
+          //                                   children: [
+          //                                     Text(
+          //                                       postData['userName'],
+          //                                       style: TextStyles.userTitle,
+          //                                     ),
+          //                                     Text(
+          //                                       'Posted 3m ago',
+          //                                       style: TextStyles
+          //                                           .profileHeaderText
+          //                                           .copyWith(
+          //                                             fontWeight:
+          //                                                 FontWeight.w300,
+          //                                             fontSize: 13,
+          //                                           ),
+          //                                     ),
+          //                                   ],
+          //                                 ),
+          //                               ],
+          //                             ),
+          //                             PopupMenuButton<MenuAction>(
+          //                               onSelected: (value) {
+          //                                 print(value);
+          //                               },
+          //                               itemBuilder: (context) {
+          //                                 return [
+          //                                   PopupMenuItem<MenuAction>(
+          //                                     value: MenuAction.delete,
+          //                                     child: Text('Delete'),
+          //                                   ),
+          //                                 ];
+          //                               },
+          //                             ),
+          //                           ],
+          //                         ),
+
+          //                         Padding(
+          //                           padding: const EdgeInsets.only(
+          //                             top: 7.0,
+          //                             left: 1.0,
+          //                           ),
+          //                           child: Text(
+          //                             style: TextStyles.profileHeaderText
+          //                                 .copyWith(
+          //                                   fontSize: 13.5,
+          //                                   fontWeight: FontWeight.w400,
+          //                                 ),
+          //                             // maxLines: 100, //modify for specific user
+          //                             postData['userPostText'],
+          //                           ),
+          //                         ),
+
+          //                         (postData['postImageUrl'] != null)
+          //                             ? Padding(
+          //                                 padding: const EdgeInsets.only(
+          //                                   top: 12,
+          //                                 ),
+          //                                 child: ClipRRect(
+          //                                   clipBehavior: Clip.antiAlias,
+          //                                   borderRadius:
+          //                                       BorderRadiusGeometry.circular(
+          //                                         16,
+          //                                       ),
+          //                                   child: Image.network(
+          //                                     postData['postImageUrl'],
+          //                                   ),
+          //                                 ),
+          //                               )
+          //                             : SizedBox(),
+          //                         Padding(
+          //                           padding: const EdgeInsets.only(top: 11),
+          //                           child: Row(
+          //                             children: [
+          //                               GestureDetector(
+          //                                 onTap: () {
+          //                                   print('reactions');
+          //                                 },
+          //                                 child: Row(
+          //                                   children: [
+          //                                     Icon(
+          //                                       FluentIcons.heart_16_regular,
+          //                                     ),
+          //                                     SizedBox(width: 5),
+          //                                     Text('574'),
+          //                                   ],
+          //                                 ),
+          //                               ),
+          //                               SizedBox(width: 17),
+          //                               GestureDetector(
+          //                                 onTap: () {
+          //                                   print('commented');
+          //                                 },
+          //                                 child: Row(
+          //                                   children: [
+          //                                     Icon(
+          //                                       FluentIcons.comment_28_regular,
+          //                                     ),
+          //                                     SizedBox(width: 5),
+          //                                     Text('450'),
+          //                                   ],
+          //                                 ),
+          //                               ),
+          //                             ],
+          //                           ),
+          //                         ),
+          //                       ],
+          //                     ),
+          //                   ),
+          //                 ],
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //   );
+          // }

@@ -1,41 +1,45 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:blog_app/utils/constants/app_routes.dart';
+import 'package:blog_app/controller/profile_settings_notifier.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
+import 'package:provider/provider.dart';
 
-class ProfileSettings extends StatefulWidget {
-  const ProfileSettings({super.key});
+class CreatePost extends StatefulWidget {
+  const CreatePost({super.key});
 
   @override
-  State<ProfileSettings> createState() => _ProfileSettingsState();
+  State<CreatePost> createState() => _CreatePostState();
 }
 
-class _ProfileSettingsState extends State<ProfileSettings> {
+class _CreatePostState extends State<CreatePost> {
   late final TextEditingController _titleController;
-  late final TextEditingController _aboutController;
+  late final TextEditingController _postController;
+  late final TextEditingController _commentController;
+  String nm = '';
+  String img = '';
 
-  File? coverFile;
-  File? profile;
+  File? postImageFile;
 
   @override
   void initState() {
     _titleController = TextEditingController();
-    _aboutController = TextEditingController();
+    _postController = TextEditingController();
+    _commentController = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
     _titleController.dispose();
-    _aboutController.dispose();
+    _postController.dispose();
+    _commentController.dispose();
     super.dispose();
   }
 
@@ -71,25 +75,37 @@ class _ProfileSettingsState extends State<ProfileSettings> {
     }
   }
 
-  Future<void> profileUpdate() async {
+  Future<void> userPost() async {
     try {
-      String? coverImageUrl;
-      String? profileImageUrl;
+      String? postImageUrl;
 
-      if (coverFile != null) {
-        coverImageUrl = await uploadToCloudinary(coverFile!);
-      }
-      if (profile != null) {
-        profileImageUrl = await uploadToCloudinary(profile!);
+      if (postImageFile != null) {
+        postImageUrl = await uploadToCloudinary(postImageFile!);
       }
 
-      await FirebaseFirestore.instance.collection("profilesettings").add({
+      final profile = Provider.of<ProfileSettingsNotifier>(
+        context,
+        listen: false,
+      );
+      final userName = profile.userName;
+      final userImageUrl = profile.profileImageUrl;
+
+      if (userName.isEmpty || userImageUrl.isEmpty) {
+        print("User data not loaded.");
+        // Optional: fetch from Firestore fallback
+        return;
+      }
+
+      final postDoc = FirebaseFirestore.instance.collection("posts").doc();
+      await postDoc.set({
+        "documentId": postDoc.id,
         "userId": FirebaseAuth.instance.currentUser!.uid,
-        "name": _titleController.text.trim(),
-        "about": _aboutController.text.trim(),
+        "userName": userName,
+        "userPostText": _postController.text,
+        "userImageUrl": userImageUrl ?? "",
+        "postImageUrl": postImageUrl ?? "",
         "postedAt": FieldValue.serverTimestamp(),
-        "profileImageUrl": profileImageUrl ?? "",
-        "coverImageUrl": coverImageUrl ?? "",
+        "updatedAt": FieldValue.serverTimestamp(),
       });
     } catch (e) {
       print(e);
@@ -102,12 +118,11 @@ class _ProfileSettingsState extends State<ProfileSettings> {
       appBar: AppBar(),
       body: Column(
         children: [
-          Text('Cover:'),
           GestureDetector(
             onTap: () async {
               final image = await selectImage();
               setState(() {
-                coverFile = image;
+                postImageFile = image;
               });
             },
             child: DottedBorder(
@@ -121,35 +136,8 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: coverFile != null
-                    ? Image.file(coverFile!)
-                    : const Center(
-                        child: Icon(Icons.camera_alt_outlined, size: 40),
-                      ),
-              ),
-            ),
-          ),
-          Text('Profile'),
-          GestureDetector(
-            onTap: () async {
-              final image = await selectImage();
-              setState(() {
-                profile = image;
-              });
-            },
-            child: DottedBorder(
-              // borderType: BorderType.RRect,
-              // radius: const Radius.circular(10),
-              // dashPattern: const [10, 4],
-              // strokeCap: StrokeCap.round,
-              child: Container(
-                width: double.infinity,
-                height: 150,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: profile != null
-                    ? Image.file(profile!)
+                child: postImageFile != null
+                    ? Image.file(postImageFile!)
                     : const Center(
                         child: Icon(Icons.camera_alt_outlined, size: 40),
                       ),
@@ -157,26 +145,18 @@ class _ProfileSettingsState extends State<ProfileSettings> {
             ),
           ),
           TextFormField(
-            controller: _titleController,
-            decoration: InputDecoration(hintText: 'Your name?'),
+            controller: _postController,
+            decoration: InputDecoration(hintText: 'Write your post...'),
           ),
-          TextFormField(
-            controller: _aboutController,
-            decoration: InputDecoration(hintText: 'About yourself....'),
-          ),
-
+          // TextFormField(
+          //   controller: _commentController,
+          //   decoration: InputDecoration(hintText: 'Write a comment..'),
+          // ),
           TextButton(
             onPressed: () async {
-              await profileUpdate();
-              GetStorage().write(
-                'userConfirmed',
-                FirebaseAuth.instance.currentUser!.uid,
-              );
-              Navigator.of(
-                context,
-              ).pushNamedAndRemoveUntil(profileRoute, (_) => false);
+              await userPost();
             },
-            child: const Text('Save Profile'),
+            child: const Text('Post'),
           ),
         ],
       ),

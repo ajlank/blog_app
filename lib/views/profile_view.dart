@@ -4,6 +4,7 @@ import 'package:blog_app/customs/custom_clipper.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -21,6 +22,23 @@ class ProfileView extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Text('Loading..');
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Please update your profile and navigate to this view"),
+
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(profileSettingsRoute);
+                    },
+                    child: const Text('Update profile'),
+                  ),
+                ],
+              ),
+            );
           }
           if (snapshot.hasData) {
             final docs = snapshot.data!.docs;
@@ -65,6 +83,26 @@ class ProfileView extends StatelessWidget {
                           Container(
                             child: Row(
                               children: [
+                                IconButton(
+                                  onPressed: () {
+                                    Navigator.of(
+                                      context,
+                                    ).pushNamed(createPostRoute);
+                                  },
+                                  icon: Icon(FluentIcons.add_16_regular),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    Navigator.of(
+                                      context,
+                                    ).pushNamedAndRemoveUntil(
+                                      homeRoute,
+                                      (_) => false,
+                                    );
+                                  },
+                                  icon: Icon(FluentIcons.home_12_regular),
+                                ),
+
                                 GestureDetector(
                                   onTap: () {
                                     Navigator.of(
