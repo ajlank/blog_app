@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
 enum MenuAction { delete, update }
@@ -15,7 +16,7 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    // final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 225, 227, 230),
       appBar: AppBar(
@@ -60,7 +61,6 @@ class HomeView extends StatelessWidget {
               itemCount: docs.length,
               itemBuilder: (context, index) {
                 final postData = docs[index].data();
-
                 return Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
@@ -88,7 +88,7 @@ class HomeView extends StatelessWidget {
                                 style: TextStyles.userTitle,
                               ),
                               Text(
-                                'Posted just now', // You can later use Timestamp to calculate time ago
+                                'Posted just now',
                                 style: TextStyles.profileHeaderText.copyWith(
                                   fontWeight: FontWeight.w300,
                                   fontSize: 13,
@@ -117,13 +117,77 @@ class HomeView extends StatelessWidget {
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          GestureDetector(
-                            onTap: () {},
-                            child: Icon(FluentIcons.heart_16_regular),
-                          ),
+                          !((postData["likedBy"] as List<dynamic>).contains(
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                  ) &&
+                                  ((postData["isLiked"] as List<dynamic>)
+                                      .contains(
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                      )))
+                              ? GestureDetector(
+                                  onTap: () async {
+                                    final currentUser =
+                                        FirebaseAuth.instance.currentUser!.uid;
+                                    final isThatUseWhoLiked =
+                                        (postData["likedBy"] as List<dynamic>)
+                                            .contains(currentUser);
+                                    if (!isThatUseWhoLiked ||
+                                        isThatUseWhoLiked) {
+                                      await FirebaseFirestore.instance
+                                          .collection("posts")
+                                          .doc(postData["documentId"])
+                                          .update({
+                                            'likedBy': FieldValue.arrayUnion([
+                                              FirebaseAuth
+                                                  .instance
+                                                  .currentUser!
+                                                  .uid,
+                                            ]),
+                                            'isLiked': FieldValue.arrayUnion([
+                                              FirebaseAuth
+                                                  .instance
+                                                  .currentUser!
+                                                  .uid,
+                                            ]),
+                                            'likeCount': FieldValue.increment(
+                                              1,
+                                            ),
+                                          });
+                                    }
+                                  },
+                                  child: Icon(FluentIcons.heart_16_regular),
+                                )
+                              : GestureDetector(
+                                  onTap: () async {
+                                    final currentUser =
+                                        FirebaseAuth.instance.currentUser!.uid;
+                                    final isThatUseWhoLiked =
+                                        (postData["likedBy"] as List<dynamic>)
+                                            .contains(currentUser);
+                                    if (isThatUseWhoLiked) {
+                                      await FirebaseFirestore.instance
+                                          .collection("posts")
+                                          .doc(postData["documentId"])
+                                          .update({
+                                            'likeCount': FieldValue.increment(
+                                              -1,
+                                            ),
+                                            'isLiked': FieldValue.arrayRemove([
+                                              FirebaseAuth
+                                                  .instance
+                                                  .currentUser!
+                                                  .uid,
+                                            ]),
+                                          });
+                                    }
+                                  },
+                                  child: Icon(FluentIcons.heart_16_filled),
+                                ),
+
                           const SizedBox(width: 5),
-                          Text('74'), // Replace with real count
+                          Text(postData['likeCount'].toString()),
                           const SizedBox(width: 17),
+
                           GestureDetector(
                             onTap: () async {
                               context.read<PostCommentNotifier>().setDocId(
@@ -140,7 +204,7 @@ class HomeView extends StatelessWidget {
                             child: Icon(FluentIcons.comment_28_regular),
                           ),
                           const SizedBox(width: 5),
-                          Text('20'),
+                          Text('202'),
                         ],
                       ),
                     ],
