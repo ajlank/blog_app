@@ -1,4 +1,5 @@
 import 'package:blog_app/base/styles/text_styles.dart';
+import 'package:blog_app/controller/home_user_profile_notifier.dart';
 import 'package:blog_app/controller/post_comment_notifier.dart';
 import 'package:blog_app/controller/profile_settings_notifier.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
@@ -6,7 +7,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
 enum MenuAction { delete, update }
@@ -23,7 +23,7 @@ class HomeView extends StatelessWidget {
         backgroundColor: Colors.white,
         actionsPadding: EdgeInsets.all(12),
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(FluentIcons.home_12_regular)),
+          IconButton(onPressed: () {}, icon: Icon(Icons.notifications_active)),
           IconButton(
             onPressed: () {
               Navigator.of(context).pushNamed(profileRoute);
@@ -83,9 +83,19 @@ class HomeView extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                postData['userName'] ?? '',
-                                style: TextStyles.userTitle,
+                              GestureDetector(
+                                onTap: () {
+                                  context
+                                      .read<HomeUserProfileNotifier>()
+                                      .setHomeUserId(postData['userId']);
+                                  Navigator.of(
+                                    context,
+                                  ).pushNamed(homeUserRoute);
+                                },
+                                child: Text(
+                                  postData['userName'] ?? '',
+                                  style: TextStyles.userTitle,
+                                ),
                               ),
                               Text(
                                 'Posted just now',
@@ -204,7 +214,7 @@ class HomeView extends StatelessWidget {
                             child: Icon(FluentIcons.comment_28_regular),
                           ),
                           const SizedBox(width: 5),
-                          Text('202'),
+                          Text(postData['totalComment'].toString()),
                         ],
                       ),
                     ],
@@ -262,7 +272,10 @@ void showCommentsSheet(BuildContext context, String postId) {
                   }
 
                   final comments = snapshot.data!.docs;
-
+                  FirebaseFirestore.instance
+                      .collection('posts')
+                      .doc(postId)
+                      .update({'totalComment': comments.length});
                   if (comments.isEmpty) {
                     return const Center(child: Text("No comments yet."));
                   }
@@ -271,6 +284,7 @@ void showCommentsSheet(BuildContext context, String postId) {
                     itemCount: comments.length,
                     itemBuilder: (context, index) {
                       final comment = comments[index];
+
                       return ListTile(
                         leading: CircleAvatar(
                           backgroundImage: NetworkImage(comment['userImage']),

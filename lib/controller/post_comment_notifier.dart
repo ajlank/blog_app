@@ -5,6 +5,7 @@ class PostCommentNotifier with ChangeNotifier {
   String _commentCollectionId = '';
   bool _isTapped = false;
   String _postId = '';
+
   void setDocId(String id) {
     _docId = id;
     notifyListeners();
@@ -16,7 +17,6 @@ class PostCommentNotifier with ChangeNotifier {
   }
 
   void toggleTapped(bool val, String pId) {
-    print(pId);
     _isTapped = val;
     _postId = pId;
     notifyListeners();

@@ -1,4 +1,5 @@
 import 'package:blog_app/base/styles/text_styles.dart';
+import 'package:blog_app/controller/home_user_profile_notifier.dart';
 import 'package:blog_app/controller/profile_settings_notifier.dart';
 import 'package:blog_app/customs/custom_clipper.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
@@ -8,8 +9,8 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ProfileView extends StatelessWidget {
-  const ProfileView({super.key});
+class HomeUserView extends StatelessWidget {
+  const HomeUserView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,10 @@ class ProfileView extends StatelessWidget {
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection("profilesettings")
-            .where("userId", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .where(
+              "userId",
+              isEqualTo: context.watch<HomeUserProfileNotifier>().homeUserId,
+            )
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -315,61 +319,62 @@ class ProfileView extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            print('Following');
-                          },
-                          child: Container(
-                            height: 40,
-                            width: 120,
-                            decoration: BoxDecoration(
-                              color: Colors.brown,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text(
-                                  'Following',
-                                  style: TextStyles.profileButtonDesign
-                                      .copyWith(fontSize: 15),
+                        (context.read<HomeUserProfileNotifier>().homeUserId !=
+                                FirebaseAuth.instance.currentUser!.uid)
+                            ? GestureDetector(
+                                onTap: () {
+                                  print('Following');
+                                },
+                                child: Container(
+                                  height: 40,
+                                  width: 120,
+                                  decoration: BoxDecoration(
+                                    color: Colors.brown,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Text(
+                                        'Follow',
+                                        style: TextStyles.profileButtonDesign
+                                            .copyWith(fontSize: 15),
+                                      ),
+                                      Icon(Icons.add, color: Colors.white),
+                                    ],
+                                  ),
                                 ),
-                                Icon(
-                                  Icons.people_alt_outlined,
-                                  color: Colors.white,
+                              )
+                            : SizedBox.shrink(),
+                        (context.read<HomeUserProfileNotifier>().homeUserId !=
+                                FirebaseAuth.instance.currentUser!.uid)
+                            ? GestureDetector(
+                                onTap: () {
+                                  print('Message sent to this user');
+                                },
+                                child: Container(
+                                  height: 40,
+                                  width: 120,
+                                  decoration: BoxDecoration(
+                                    color: Colors.brown,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Text(
+                                        'Chat',
+                                        style: TextStyles.profileButtonDesign
+                                            .copyWith(fontSize: 15),
+                                      ),
+                                      Icon(Icons.chat, color: Colors.white),
+                                    ],
+                                  ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            print('Message sent to this user');
-                          },
-                          child: Container(
-                            height: 40,
-                            width: 120,
-                            decoration: BoxDecoration(
-                              color: Colors.brown,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text(
-                                  'Messages',
-                                  style: TextStyles.profileButtonDesign
-                                      .copyWith(fontSize: 15),
-                                ),
-                                Icon(Icons.chat, color: Colors.white),
-                                Container(
-                                  margin: EdgeInsets.only(bottom: 25),
-                                  child: Badge(label: Text('1')),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                              )
+                            : SizedBox.shrink(),
                       ],
                     ),
                   ),
