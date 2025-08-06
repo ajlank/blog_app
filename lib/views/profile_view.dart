@@ -1,4 +1,5 @@
 import 'package:blog_app/base/styles/text_styles.dart';
+import 'package:blog_app/controller/notification_notifier.dart';
 import 'package:blog_app/controller/profile_settings_notifier.dart';
 import 'package:blog_app/customs/custom_clipper.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
@@ -47,6 +48,13 @@ class ProfileView extends StatelessWidget {
               profileData['profileImageUrl'],
               profileData['name'],
             );
+            context.read<NotificationNotifier>().setNotifierSenderImage(
+              profileData['profileImageUrl'],
+            );
+            context.read<NotificationNotifier>().setNotifierSenderName(
+              profileData['name'],
+            );
+
             return CustomScrollView(
               slivers: [
                 SliverAppBar(
@@ -330,7 +338,7 @@ class ProfileView extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Text(
-                                  'Following',
+                                  'Followers',
                                   style: TextStyles.profileButtonDesign
                                       .copyWith(fontSize: 15),
                                 ),

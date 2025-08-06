@@ -1,11 +1,14 @@
 import 'package:blog_app/controller/home_user_profile_notifier.dart';
+import 'package:blog_app/controller/notification_notifier.dart';
 import 'package:blog_app/controller/post_comment_notifier.dart';
 import 'package:blog_app/controller/profile_settings_notifier.dart';
 import 'package:blog_app/firebase_options.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
 import 'package:blog_app/views/auth_views/login_view.dart';
 import 'package:blog_app/views/auth_views/sign_up.dart';
+import 'package:blog_app/views/chat/chat_view.dart';
 import 'package:blog_app/views/home_view.dart';
+import 'package:blog_app/views/notifications/user_notification.dart';
 import 'package:blog_app/views/profile_view.dart';
 import 'package:blog_app/views/settings/profile_settings.dart';
 import 'package:blog_app/views/user_posts/create_post.dart';
@@ -31,6 +34,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => ProfileSettingsNotifier()),
         ChangeNotifierProvider(create: (context) => PostCommentNotifier()),
         ChangeNotifierProvider(create: (context) => HomeUserProfileNotifier()),
+        ChangeNotifierProvider(create: (context) => NotificationNotifier()),
       ],
       child: MyApp(),
     ),
@@ -67,6 +71,8 @@ class MyApp extends StatelessWidget {
         createPostRoute: (context) => CreatePost(),
         homeRoute: (context) => HomeView(),
         homeUserRoute: (context) => HomeUserView(),
+        notificationsRoute: (context) => UserNotification(),
+        chatViewRoute: (context) => ChatView(),
       },
     );
   }

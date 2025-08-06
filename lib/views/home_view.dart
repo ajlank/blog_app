@@ -1,5 +1,6 @@
 import 'package:blog_app/base/styles/text_styles.dart';
 import 'package:blog_app/controller/home_user_profile_notifier.dart';
+import 'package:blog_app/controller/notification_notifier.dart';
 import 'package:blog_app/controller/post_comment_notifier.dart';
 import 'package:blog_app/controller/profile_settings_notifier.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
@@ -23,7 +24,12 @@ class HomeView extends StatelessWidget {
         backgroundColor: Colors.white,
         actionsPadding: EdgeInsets.all(12),
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.notifications_active)),
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(notificationsRoute);
+            },
+            icon: Icon(Icons.notifications_active),
+          ),
           IconButton(
             onPressed: () {
               Navigator.of(context).pushNamed(profileRoute);
@@ -88,6 +94,9 @@ class HomeView extends StatelessWidget {
                                   context
                                       .read<HomeUserProfileNotifier>()
                                       .setHomeUserId(postData['userId']);
+                                  context
+                                      .read<NotificationNotifier>()
+                                      .setNotifRecieverId(postData['userId']);
                                   Navigator.of(
                                     context,
                                   ).pushNamed(homeUserRoute);
@@ -127,10 +136,12 @@ class HomeView extends StatelessWidget {
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          !((postData["likedBy"] as List<dynamic>).contains(
-                                    FirebaseAuth.instance.currentUser!.uid,
-                                  ) &&
-                                  ((postData["isLiked"] as List<dynamic>)
+                          !(((postData["likedBy"] ?? []) as List<dynamic>)
+                                      .contains(
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                      ) &&
+                                  (((postData["isLiked"] ?? [])
+                                          as List<dynamic>)
                                       .contains(
                                         FirebaseAuth.instance.currentUser!.uid,
                                       )))
@@ -139,7 +150,8 @@ class HomeView extends StatelessWidget {
                                     final currentUser =
                                         FirebaseAuth.instance.currentUser!.uid;
                                     final isThatUseWhoLiked =
-                                        (postData["likedBy"] as List<dynamic>)
+                                        ((postData["likedBy"] ?? [])
+                                                as List<dynamic>)
                                             .contains(currentUser);
                                     if (!isThatUseWhoLiked ||
                                         isThatUseWhoLiked) {
@@ -172,7 +184,8 @@ class HomeView extends StatelessWidget {
                                     final currentUser =
                                         FirebaseAuth.instance.currentUser!.uid;
                                     final isThatUseWhoLiked =
-                                        (postData["likedBy"] as List<dynamic>)
+                                        ((postData["likedBy"] ?? [])
+                                                as List<dynamic>)
                                             .contains(currentUser);
                                     if (isThatUseWhoLiked) {
                                       await FirebaseFirestore.instance

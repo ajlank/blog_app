@@ -1,5 +1,6 @@
 import 'package:blog_app/base/styles/text_styles.dart';
 import 'package:blog_app/controller/home_user_profile_notifier.dart';
+import 'package:blog_app/controller/notification_notifier.dart';
 import 'package:blog_app/controller/profile_settings_notifier.dart';
 import 'package:blog_app/customs/custom_clipper.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
@@ -261,7 +262,7 @@ class HomeUserView extends StatelessWidget {
                               children: [
                                 Icon(Icons.people),
                                 SizedBox(height: 4),
-                                Text('1.8k'),
+                                Text(profileData['followCount'].toString()),
                                 SizedBox(height: 4),
 
                                 Text(
@@ -320,11 +321,109 @@ class HomeUserView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         (context.read<HomeUserProfileNotifier>().homeUserId !=
-                                FirebaseAuth.instance.currentUser!.uid)
+                                    FirebaseAuth.instance.currentUser!.uid) &&
+                                ((profileData['followers'] as List<dynamic>)
+                                    .contains(
+                                      FirebaseAuth.instance.currentUser!.uid,
+                                    ))
                             ? GestureDetector(
                                 onTap: () {
-                                  print('Following');
+                                  FirebaseFirestore.instance
+                                      .collection('profilesettings')
+                                      .doc(docs.first.id)
+                                      .update({
+                                        "followers": FieldValue.arrayRemove([
+                                          FirebaseAuth
+                                              .instance
+                                              .currentUser!
+                                              .uid,
+                                        ]),
+                                        "followCount": FieldValue.increment(-1),
+                                      });
+                                  showSnckBar(
+                                    context,
+                                    "Successfully unfollowed ${profileData['name']}",
+                                  );
                                 },
+
+                                child: Container(
+                                  height: 40,
+                                  width: 120,
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Text(
+                                        'Following',
+                                        style: TextStyles.profileButtonDesign
+                                            .copyWith(fontSize: 15),
+                                      ),
+                                      Icon(
+                                        Icons.arrow_downward_sharp,
+                                        color: Colors.white,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : (!(profileData['followers'] as List<dynamic>)
+                                  .contains(
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                  ))
+                            ? GestureDetector(
+                                onTap: () async {
+                                  await FirebaseFirestore.instance
+                                      .collection('profilesettings')
+                                      .doc(docs.first.id)
+                                      .update({
+                                        "followers": FieldValue.arrayUnion([
+                                          FirebaseAuth
+                                              .instance
+                                              .currentUser!
+                                              .uid,
+                                        ]),
+                                        "followCount": FieldValue.increment(1),
+                                      });
+                                  try {
+                                    await FirebaseFirestore.instance
+                                        .collection('followingNotifications')
+                                        .add({
+                                          "notifSenderId": FirebaseAuth
+                                              .instance
+                                              .currentUser!
+                                              .uid,
+                                          "notifRecieverId":
+                                              Provider.of<NotificationNotifier>(
+                                                context,
+                                                listen: false,
+                                              ).notifRecieverId,
+                                          "notifSenderImg":
+                                              Provider.of<NotificationNotifier>(
+                                                context,
+                                                listen: false,
+                                              ).notifSenderImage,
+                                          "notifSenderName":
+                                              Provider.of<NotificationNotifier>(
+                                                context,
+                                                listen: false,
+                                              ).notifSenderName,
+                                          "createdAt":
+                                              FieldValue.serverTimestamp(),
+                                        });
+
+                                    showSnckBar(
+                                      context,
+                                      "You are now following ${profileData['name']}",
+                                    );
+                                  } catch (e) {
+                                    print(e.toString());
+                                  }
+                                },
+
                                 child: Container(
                                   height: 40,
                                   width: 120,
@@ -412,4 +511,15 @@ class HomeUserView extends StatelessWidget {
       ),
     );
   }
+}
+
+void showSnckBar(BuildContext context, String text) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(text),
+      duration: const Duration(seconds: 3),
+      backgroundColor: Colors.black,
+      padding: EdgeInsets.all(14),
+    ),
+  );
 }
