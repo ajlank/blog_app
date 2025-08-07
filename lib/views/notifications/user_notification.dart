@@ -1,5 +1,4 @@
 import 'package:blog_app/base/styles/text_styles.dart';
-import 'package:blog_app/controller/home_user_profile_notifier.dart';
 import 'package:blog_app/controller/notification_notifier.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,10 +20,6 @@ class UserNotification extends StatelessWidget {
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('followingNotifications')
-            .where(
-              'notifRecieverId',
-              isEqualTo: context.watch<NotificationNotifier>().notifRecieverId,
-            )
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -39,6 +34,10 @@ class UserNotification extends StatelessWidget {
               itemCount: doc.length,
               itemBuilder: (context, index) {
                 final notif = doc[index].data();
+                if (notif['notifRecieverId'] !=
+                    FirebaseAuth.instance.currentUser!.uid) {
+                  return SizedBox.shrink();
+                }
                 return Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: ListTile(

@@ -34,7 +34,11 @@ class _LoginViewState extends State<LoginView> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      print(userCred.user);
+      if (userCred != null) {
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil(profileRoute, (_) => false);
+      }
     } on FirebaseAuthException catch (e) {
       print(e.message);
     }
@@ -63,9 +67,6 @@ class _LoginViewState extends State<LoginView> {
             TextButton(
               onPressed: () async {
                 await loginUser();
-                Navigator.of(
-                  context,
-                ).pushNamedAndRemoveUntil(homeRoute, (_) => false);
               },
               child: const Text('Login'),
             ),

@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 enum MenuAction { delete, update }
 
@@ -55,7 +56,10 @@ class HomeView extends StatelessWidget {
         ],
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('posts').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('posts')
+            .orderBy("postedAt", descending: true)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: Text('Loading'));
@@ -97,6 +101,9 @@ class HomeView extends StatelessWidget {
                                   context
                                       .read<NotificationNotifier>()
                                       .setNotifRecieverId(postData['userId']);
+                                  context
+                                      .read<HomeUserProfileNotifier>()
+                                      .setHomeUserName(postData['userName']);
                                   Navigator.of(
                                     context,
                                   ).pushNamed(homeUserRoute);
@@ -107,10 +114,10 @@ class HomeView extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                'Posted just now',
+                                'Posted on ${DateFormat('MMMM d, y – hh:mm a').format((postData['postedAt'] as Timestamp).toDate())}',
                                 style: TextStyles.profileHeaderText.copyWith(
                                   fontWeight: FontWeight.w300,
-                                  fontSize: 13,
+                                  fontSize: 12,
                                 ),
                               ),
                             ],

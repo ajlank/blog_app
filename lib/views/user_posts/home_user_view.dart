@@ -322,7 +322,8 @@ class HomeUserView extends StatelessWidget {
                       children: [
                         (context.read<HomeUserProfileNotifier>().homeUserId !=
                                     FirebaseAuth.instance.currentUser!.uid) &&
-                                ((profileData['followers'] as List<dynamic>)
+                                (((profileData['followers'] ?? [])
+                                        as List<dynamic>)
                                     .contains(
                                       FirebaseAuth.instance.currentUser!.uid,
                                     ))
@@ -370,7 +371,8 @@ class HomeUserView extends StatelessWidget {
                                   ),
                                 ),
                               )
-                            : (!(profileData['followers'] as List<dynamic>)
+                            : (!((profileData['followers'] ?? [])
+                                      as List<dynamic>)
                                   .contains(
                                     FirebaseAuth.instance.currentUser!.uid,
                                   ))
@@ -450,7 +452,9 @@ class HomeUserView extends StatelessWidget {
                                 FirebaseAuth.instance.currentUser!.uid)
                             ? GestureDetector(
                                 onTap: () {
-                                  print('Message sent to this user');
+                                  Navigator.of(
+                                    context,
+                                  ).pushNamed(chatViewRoute);
                                 },
                                 child: Container(
                                   height: 40,
