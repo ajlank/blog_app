@@ -1,7 +1,9 @@
+import 'package:blog_app/controller/notification_notifier.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -34,7 +36,10 @@ class _LoginViewState extends State<LoginView> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      if (userCred != null) {
+      if (userCred.user != null) {
+        context.read<NotificationNotifier>().setNotifRecieverId(
+          userCred.user!.uid,
+        );
         Navigator.of(
           context,
         ).pushNamedAndRemoveUntil(profileRoute, (_) => false);

@@ -5,8 +5,25 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class UserNotification extends StatelessWidget {
+class UserNotification extends StatefulWidget {
   const UserNotification({super.key});
+
+  @override
+  State<UserNotification> createState() => _UserNotificationState();
+}
+
+class _UserNotificationState extends State<UserNotification> {
+  @override
+  void initState() {
+    context.read<NotificationNotifier>().setAnyNotification(false);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    context.read<NotificationNotifier>().setAnyNotification(false);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

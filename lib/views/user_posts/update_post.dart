@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:blog_app/controller/home_post_notifier.dart';
+import 'package:blog_app/controller/home_user_profile_notifier.dart';
 import 'package:blog_app/controller/profile_settings_notifier.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
 
@@ -13,14 +15,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:provider/provider.dart';
 
-class CreatePost extends StatefulWidget {
-  const CreatePost({super.key});
+class UpdatePost extends StatefulWidget {
+  const UpdatePost({super.key});
 
   @override
-  State<CreatePost> createState() => _CreatePostState();
+  State<UpdatePost> createState() => _UpdatePostState();
 }
 
-class _CreatePostState extends State<CreatePost> {
+class _UpdatePostState extends State<UpdatePost> {
   late final TextEditingController _titleController;
   late final TextEditingController _postController;
   late final TextEditingController _commentController;
@@ -32,7 +34,18 @@ class _CreatePostState extends State<CreatePost> {
   @override
   void initState() {
     _titleController = TextEditingController();
-    _postController = TextEditingController();
+    _postController =
+        Provider.of<HomePostNotifier>(
+          context,
+          listen: false,
+        ).postText.isNotEmpty
+        ? TextEditingController(
+            text: Provider.of<HomePostNotifier>(
+              context,
+              listen: false,
+            ).postText,
+          )
+        : TextEditingController();
     _commentController = TextEditingController();
     super.initState();
   }
@@ -77,7 +90,7 @@ class _CreatePostState extends State<CreatePost> {
     }
   }
 
-  Future<void> userPost() async {
+  Future<void> updateUserPost(String docId) async {
     try {
       String? postImageUrl;
 
@@ -85,27 +98,30 @@ class _CreatePostState extends State<CreatePost> {
         postImageUrl = await uploadToCloudinary(postImageFile!);
       }
 
-      final profile = Provider.of<ProfileSettingsNotifier>(
-        context,
-        listen: false,
-      );
+      final profile = Provider.of<HomePostNotifier>(context, listen: false);
       final userName = profile.userName;
-      final userImageUrl = profile.profileImageUrl;
+      final userImageUrl = profile.userImgUrl;
 
       if (userName.isEmpty || userImageUrl.isEmpty) {
         print("User data not loaded.");
         // Optional: fetch from Firestore fallback
         return;
       }
-      final postDoc = FirebaseFirestore.instance.collection("posts").doc();
+      final postDoc = FirebaseFirestore.instance.collection("posts").doc(docId);
 
-      await postDoc.set({
+      await postDoc.update({
         "documentId": postDoc.id,
         "userId": FirebaseAuth.instance.currentUser!.uid,
         "userName": userName,
         "userPostText": _postController.text,
         "userImageUrl": userImageUrl ?? "",
-        "postImageUrl": postImageUrl ?? "",
+        "postImageUrl":
+            Provider.of<HomePostNotifier>(
+              context,
+              listen: false,
+            ).postImg.isNotEmpty
+            ? Provider.of<HomePostNotifier>(context, listen: false).postImg
+            : postImageUrl ?? '',
         "postedAt": FieldValue.serverTimestamp(),
         "updatedAt": FieldValue.serverTimestamp(),
       });
@@ -159,9 +175,11 @@ class _CreatePostState extends State<CreatePost> {
           // ),
           TextButton(
             onPressed: () async {
-              await userPost();
+              await updateUserPost(
+                Provider.of<HomePostNotifier>(context, listen: false).docId,
+              );
             },
-            child: const Text('Post'),
+            child: const Text('Update'),
           ),
         ],
       ),

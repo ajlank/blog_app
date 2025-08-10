@@ -1,4 +1,5 @@
 import 'package:blog_app/base/styles/text_styles.dart';
+import 'package:blog_app/controller/home_post_notifier.dart';
 import 'package:blog_app/controller/home_user_profile_notifier.dart';
 import 'package:blog_app/controller/notification_notifier.dart';
 import 'package:blog_app/controller/post_comment_notifier.dart';
@@ -18,7 +19,6 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 225, 227, 230),
       appBar: AppBar(
@@ -29,7 +29,22 @@ class HomeView extends StatelessWidget {
             onPressed: () {
               Navigator.of(context).pushNamed(notificationsRoute);
             },
-            icon: Icon(Icons.notifications_active),
+            icon:
+                (Provider.of<NotificationNotifier>(
+                          context,
+                          listen: false,
+                        ).isAnyNotification ==
+                        true &&
+                    Provider.of<NotificationNotifier>(
+                          context,
+                          listen: false,
+                        ).notificationRId ==
+                        FirebaseAuth.instance.currentUser!.uid)
+                ? Badge(
+                    label: Text('1'),
+                    child: Icon(Icons.notifications_active),
+                  )
+                : Icon(Icons.notifications_active),
           ),
           IconButton(
             onPressed: () {
@@ -66,11 +81,13 @@ class HomeView extends StatelessWidget {
           }
           if (snapshot.hasData) {
             final docs = snapshot.data!.docs;
+
             return ListView.builder(
               padding: const EdgeInsets.all(12),
               itemCount: docs.length,
               itemBuilder: (context, index) {
                 final postData = docs[index].data();
+
                 return Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
@@ -122,6 +139,64 @@ class HomeView extends StatelessWidget {
                               ),
                             ],
                           ),
+                          (postData['userId'] ==
+                                  FirebaseAuth.instance.currentUser!.uid)
+                              ? PopupMenuButton<MenuAction>(
+                                  onSelected: (value) async {
+                                    switch (value) {
+                                      case MenuAction.delete:
+                                        await FirebaseFirestore.instance
+                                            .collection('posts')
+                                            .doc(postData['documentId'])
+                                            .delete();
+                                        showSnckBarr(context, 'post deleted');
+
+                                      case MenuAction.update:
+                                        context
+                                            .read<HomePostNotifier>()
+                                            .setUserName(postData['userName']);
+                                        context
+                                            .read<HomePostNotifier>()
+                                            .setUserImgUrl(
+                                              postData['userImageUrl'],
+                                            );
+                                        context
+                                            .read<HomePostNotifier>()
+                                            .setDocId(postData['documentId']);
+                                        context
+                                            .read<HomePostNotifier>()
+                                            .setPostImage(
+                                              postData['postImageUrl'],
+                                            );
+                                        context
+                                            .read<HomePostNotifier>()
+                                            .setPostTex(
+                                              postData['userPostText'],
+                                            );
+                                        Navigator.of(
+                                          context,
+                                        ).pushNamed(updatePostRoute);
+                                    }
+                                  },
+                                  itemBuilder: (context) {
+                                    return [
+                                      PopupMenuItem<MenuAction>(
+                                        height: 2.1,
+
+                                        value: MenuAction.delete,
+                                        child: Text('delete'),
+                                      ),
+
+                                      PopupMenuItem<MenuAction>(
+                                        height: 2.1,
+
+                                        value: MenuAction.update,
+                                        child: Text('update'),
+                                      ),
+                                    ];
+                                  },
+                                )
+                              : SizedBox.shrink(),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -160,6 +235,7 @@ class HomeView extends StatelessWidget {
                                         ((postData["likedBy"] ?? [])
                                                 as List<dynamic>)
                                             .contains(currentUser);
+
                                     if (!isThatUseWhoLiked ||
                                         isThatUseWhoLiked) {
                                       await FirebaseFirestore.instance
@@ -194,6 +270,7 @@ class HomeView extends StatelessWidget {
                                         ((postData["likedBy"] ?? [])
                                                 as List<dynamic>)
                                             .contains(currentUser);
+
                                     if (isThatUseWhoLiked) {
                                       await FirebaseFirestore.instance
                                           .collection("posts")
@@ -372,8 +449,16 @@ void showCommentsSheet(BuildContext context, String postId) {
   );
 }
 
-
-
+void showSnckBarr(BuildContext context, String text) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(text),
+      duration: const Duration(seconds: 3),
+      backgroundColor: Colors.black,
+      padding: EdgeInsets.all(14),
+    ),
+  );
+}
           // if (snapshot.hasData) {
           //   final docs = snapshot.data!.docs;
           //   final postData = docs.first.data();

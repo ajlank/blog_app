@@ -14,6 +14,28 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Future<int> getUserPostCount(String userId) async {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('posts')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      return snapshot.docs.length;
+    }
+
+    Future<int> getUserReactionCount(String userId) async {
+      double totalReaction = 0;
+      final snapshots = await FirebaseFirestore.instance
+          .collection('posts')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      for (var doc in snapshots.docs) {
+        totalReaction += doc.data()['likeCount'] ?? 0;
+      }
+      return totalReaction.toInt();
+    }
+
     return Scaffold(
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
@@ -231,7 +253,27 @@ class ProfileView extends StatelessWidget {
                               children: [
                                 Icon(Icons.post_add),
                                 SizedBox(height: 4),
-                                Text('24'),
+                                FutureBuilder<int>(
+                                  future: getUserPostCount(
+                                    profileData['userId'],
+                                  ),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return SizedBox(
+                                        height: 14,
+                                        width: 14,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return Text("0");
+                                    } else {
+                                      return Text(snapshot.data.toString());
+                                    }
+                                  },
+                                ),
                                 SizedBox(height: 4),
 
                                 Text(
@@ -265,7 +307,7 @@ class ProfileView extends StatelessWidget {
                               children: [
                                 Icon(Icons.people),
                                 SizedBox(height: 4),
-                                Text('1.8k'),
+                                Text(profileData['followCount'].toString()),
                                 SizedBox(height: 4),
 
                                 Text(
@@ -298,7 +340,27 @@ class ProfileView extends StatelessWidget {
                               children: [
                                 Icon(Icons.favorite),
                                 SizedBox(height: 4),
-                                Text('977'),
+                                FutureBuilder<int>(
+                                  future: getUserReactionCount(
+                                    profileData['userId'],
+                                  ),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return SizedBox(
+                                        height: 14,
+                                        width: 14,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return Text("0");
+                                    } else {
+                                      return Text(snapshot.data.toString());
+                                    }
+                                  },
+                                ),
                                 SizedBox(height: 4),
 
                                 Text(
@@ -324,12 +386,10 @@ class ProfileView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         GestureDetector(
-                          onTap: () {
-                            print('Following');
-                          },
+                          onTap: () {},
                           child: Container(
                             height: 40,
-                            width: 120,
+                            width: 130,
                             decoration: BoxDecoration(
                               color: Colors.brown,
                               borderRadius: BorderRadius.circular(16),
@@ -352,11 +412,11 @@ class ProfileView extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: () {
-                            print('Message sent to this user');
+                            Navigator.of(context).pushNamed(chatViewRoute);
                           },
                           child: Container(
                             height: 40,
-                            width: 120,
+                            width: 130,
                             decoration: BoxDecoration(
                               color: Colors.brown,
                               borderRadius: BorderRadius.circular(16),
@@ -364,11 +424,13 @@ class ProfileView extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
+                                SizedBox(width: 6),
                                 Text(
                                   'Messages',
                                   style: TextStyles.profileButtonDesign
-                                      .copyWith(fontSize: 15),
+                                      .copyWith(fontSize: 14),
                                 ),
+                                SizedBox(width: 5),
                                 Icon(Icons.chat, color: Colors.white),
                                 Container(
                                   margin: EdgeInsets.only(bottom: 25),

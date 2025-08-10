@@ -28,6 +28,7 @@ dependencies:
   fluentui_system_icons: ^1.1.273
   get_storage: ^2.1.1
   intl: ^0.20.2
+  http: ^1.5.0
 
 dev_dependencies:
   flutter_test:

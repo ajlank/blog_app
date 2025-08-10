@@ -1,7 +1,6 @@
 import 'package:blog_app/controller/home_user_profile_notifier.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -66,7 +65,7 @@ class _ChatViewState extends State<ChatView> {
             Text('Chatting with', style: TextStyle(fontSize: 13)),
             SizedBox(width: 5),
             Text(
-              "${context.watch<HomeUserProfileNotifier>().homeUserName}",
+              context.watch<HomeUserProfileNotifier>().homeUserName,
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             ),
           ],

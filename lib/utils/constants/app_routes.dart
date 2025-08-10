@@ -7,3 +7,4 @@ final String homeRoute = '/homeRoute';
 final String homeUserRoute = '/homeUserRoute';
 final String notificationsRoute = '/notifications';
 final String chatViewRoute = '/chatView';
+final String updatePostRoute = '/updatePostRoute';

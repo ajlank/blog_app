@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class HomeUserProfileNotifier with ChangeNotifier {
   String _homeUserId = '';
   String _homeUserName = '';
+  String notificatioRId = '';
   void setHomeUserId(String id) {
     _homeUserId = id;
     notifyListeners();
