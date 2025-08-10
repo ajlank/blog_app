@@ -386,7 +386,9 @@ class ProfileView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.of(context).pushNamed(followerViewRoute);
+                          },
                           child: Container(
                             height: 40,
                             width: 130,
@@ -412,7 +414,7 @@ class ProfileView extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.of(context).pushNamed(chatViewRoute);
+                            Navigator.of(context).pushNamed(messagesRoute);
                           },
                           child: Container(
                             height: 40,

@@ -8,3 +8,6 @@ final String homeUserRoute = '/homeUserRoute';
 final String notificationsRoute = '/notifications';
 final String chatViewRoute = '/chatView';
 final String updatePostRoute = '/updatePostRoute';
+final String followerViewRoute = '/followerView';
+final String messagesRoute = '/messagesView';
+final String chatWithSenderRoute = '/chatWithSenderRoute';

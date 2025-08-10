@@ -29,22 +29,7 @@ class HomeView extends StatelessWidget {
             onPressed: () {
               Navigator.of(context).pushNamed(notificationsRoute);
             },
-            icon:
-                (Provider.of<NotificationNotifier>(
-                          context,
-                          listen: false,
-                        ).isAnyNotification ==
-                        true &&
-                    Provider.of<NotificationNotifier>(
-                          context,
-                          listen: false,
-                        ).notificationRId ==
-                        FirebaseAuth.instance.currentUser!.uid)
-                ? Badge(
-                    label: Text('1'),
-                    child: Icon(Icons.notifications_active),
-                  )
-                : Icon(Icons.notifications_active),
+            icon: Icon(Icons.notifications_active),
           ),
           IconButton(
             onPressed: () {
@@ -52,12 +37,7 @@ class HomeView extends StatelessWidget {
             },
             icon: Icon(FluentIcons.person_12_regular),
           ),
-          IconButton(
-            onPressed: () {
-              // Navigator.of(context).pushNamed(profileSettingsRoute);
-            },
-            icon: Icon(FluentIcons.settings_16_filled),
-          ),
+
           IconButton(
             onPressed: () async {
               await FirebaseAuth.instance.signOut();

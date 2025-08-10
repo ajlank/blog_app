@@ -5,14 +5,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ChatView extends StatefulWidget {
-  const ChatView({super.key});
+class ChatWithSenderView extends StatefulWidget {
+  const ChatWithSenderView({super.key});
 
   @override
-  State<ChatView> createState() => _ChatViewState();
+  State<ChatWithSenderView> createState() => _ChatWithSenderViewState();
 }
 
-class _ChatViewState extends State<ChatView> {
+class _ChatWithSenderViewState extends State<ChatWithSenderView> {
   late final TextEditingController _messageController;
   late final TextEditingController _recieverMessageController;
   @override
@@ -75,7 +75,7 @@ class _ChatViewState extends State<ChatView> {
             Text('Chatting with', style: TextStyle(fontSize: 13)),
             SizedBox(width: 5),
             Text(
-              context.watch<HomeUserProfileNotifier>().homeUserName,
+              context.watch<HomeUserProfileNotifier>().senderName,
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             ),
           ],
@@ -88,7 +88,12 @@ class _ChatViewState extends State<ChatView> {
             child: StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection('UserChatting')
-                  .orderBy("createdAt", descending: false)
+                  .where(
+                    'senderId',
+                    isEqualTo: context
+                        .watch<HomeUserProfileNotifier>()
+                        .allMessageSpecificUserId,
+                  )
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -104,28 +109,22 @@ class _ChatViewState extends State<ChatView> {
                     itemCount: docs.length,
                     itemBuilder: (context, index) {
                       final data = docs[index].data();
-                      return (data["senderId"] ==
-                                  FirebaseAuth.instance.currentUser!.uid &&
-                              (data["recieverId"] ==
-                                  context
-                                      .watch<HomeUserProfileNotifier>()
-                                      .homeUserId))
-                          ? Column(
-                              children: [
-                                ListTile(
-                                  title: Text(
-                                    data['recieverMessage'],
-                                    style: TextStyle(fontSize: 13.2),
-                                  ),
 
-                                  trailing: Text(
-                                    data['senderMessage'],
-                                    style: TextStyle(fontSize: 13.2),
-                                  ),
-                                ),
-                              ],
-                            )
-                          : SizedBox.shrink();
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text(
+                              data['senderMessage'],
+                              style: TextStyle(fontSize: 13.2),
+                            ),
+
+                            trailing: Text(
+                              data['recieverMessage'],
+                              style: TextStyle(fontSize: 13.2),
+                            ),
+                          ),
+                        ],
+                      );
                     },
                   );
                 }

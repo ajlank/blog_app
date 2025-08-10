@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:blog_app/controller/home_post_notifier.dart';
-import 'package:blog_app/controller/home_user_profile_notifier.dart';
-import 'package:blog_app/controller/profile_settings_notifier.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';

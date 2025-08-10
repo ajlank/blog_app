@@ -11,10 +11,13 @@ import 'package:blog_app/views/chat/chat_view.dart';
 import 'package:blog_app/views/home_view.dart';
 import 'package:blog_app/views/notifications/user_notification.dart';
 import 'package:blog_app/views/profile_view.dart';
-import 'package:blog_app/views/settings/profile_settings.dart';
+import 'package:blog_app/views/user_profile_settings/profile_settings.dart';
 import 'package:blog_app/views/user_posts/create_post.dart';
 import 'package:blog_app/views/user_posts/home_user_view.dart';
 import 'package:blog_app/views/user_posts/update_post.dart';
+import 'package:blog_app/views/user_profile_settings/views/chat_with_sender_view.dart';
+import 'package:blog_app/views/user_profile_settings/views/followers_view.dart';
+import 'package:blog_app/views/user_profile_settings/views/messages_view.dart';
 import 'package:cloudinary_flutter/cloudinary_context.dart';
 import 'package:cloudinary_url_gen/cloudinary.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -77,6 +80,9 @@ class MyApp extends StatelessWidget {
         notificationsRoute: (context) => UserNotification(),
         chatViewRoute: (context) => ChatView(),
         updatePostRoute: (context) => UpdatePost(),
+        followerViewRoute: (context) => FollowersView(),
+        messagesRoute: (context) => MessagesView(),
+        chatWithSenderRoute: (context) => ChatWithSenderView(),
       },
     );
   }
