@@ -3,6 +3,7 @@ import 'package:blog_app/utils/constants/app_routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
 class MessagesView extends StatelessWidget {
@@ -14,7 +15,7 @@ class MessagesView extends StatelessWidget {
       appBar: AppBar(title: Text('All messages'), centerTitle: true),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
-            .collection('UserChatting')
+            .collection('allChats')
             .where(
               'recieverId',
               isEqualTo: FirebaseAuth.instance.currentUser!.uid,
@@ -36,16 +37,16 @@ class MessagesView extends StatelessWidget {
                     context
                         .read<HomeUserProfileNotifier>()
                         .setAllMessageSpecificUserId(data['senderId']);
-                    context.read<HomeUserProfileNotifier>().setSenderName(
-                      data['senderName'],
-                    );
-                    Navigator.of(context).pushNamed(chatWithSenderRoute);
+                    // context.read<HomeUserProfileNotifier>().setSenderName(
+                    //   data['senderName'],
+                    // );
+                    // Navigator.of(context).pushNamed(chatWithSenderRoute);
                   },
                   leading: CircleAvatar(
-                    backgroundImage: NetworkImage(data['senderImg'] ?? ''),
+                    backgroundImage: NetworkImage(data['img'] ?? ''),
                   ),
                   title: Text(data['senderName'] ?? ''),
-                  subtitle: Text(data['senderMessage'] ?? ''),
+                  subtitle: Text(data['message'] ?? ''),
                   splashColor: const Color.fromARGB(255, 226, 221, 202),
                 );
               },

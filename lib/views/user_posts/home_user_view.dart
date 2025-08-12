@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
 class HomeUserView extends StatelessWidget {
@@ -529,7 +530,22 @@ class HomeUserView extends StatelessWidget {
                         (context.read<HomeUserProfileNotifier>().homeUserId !=
                                 FirebaseAuth.instance.currentUser!.uid)
                             ? GestureDetector(
-                                onTap: () {
+                                onTap: () async {
+                                  final snapshots = await FirebaseFirestore
+                                      .instance
+                                      .collection('curentUser')
+                                      .doc(
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                      )
+                                      .collection('user')
+                                      .get();
+
+                                  final val = snapshots.docs;
+                                  final senderName = val[0]['name'];
+                                  final recieverId = val[0]['userId'];
+                                  final senderImgUrl =
+                                      val[0]['profileImageUrl'];
+
                                   final chatRoomId = getChatId(
                                     FirebaseAuth.instance.currentUser!.uid,
                                     profileData['userId'],
@@ -540,11 +556,18 @@ class HomeUserView extends StatelessWidget {
                                       .setRecieverImage(
                                         profileData['profileImageUrl'],
                                       );
-
+                                  GetStorage().write(
+                                    profileData['userId'],
+                                    chatRoomId,
+                                  );
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (_) =>
-                                          ChatView(chatRoomId: chatRoomId),
+                                      builder: (_) => ChatView(
+                                        chatRoomId: chatRoomId,
+                                        senderName: senderName,
+                                        imgUrl: senderImgUrl,
+                                        recieverId: profileData['userId'],
+                                      ),
                                     ),
                                   );
                                 },

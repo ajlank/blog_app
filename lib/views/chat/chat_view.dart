@@ -6,24 +6,44 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ChatView extends StatelessWidget {
-  ChatView({super.key, required this.chatRoomId});
+  ChatView({
+    super.key,
+    required this.chatRoomId,
+    required this.senderName,
+    required this.imgUrl,
+    required this.recieverId,
+  });
 
   final String chatRoomId;
+  final String senderName;
+  final String imgUrl;
+  final String recieverId;
   final TextEditingController _message = TextEditingController();
 
   void onSendMessage() async {
     if (_message.text.isNotEmpty) {
       Map<String, dynamic> messages = {
         "senderId": FirebaseAuth.instance.currentUser!.uid,
+        "senderName": senderName,
+        "img": imgUrl,
         "message": _message.text,
         "time": FieldValue.serverTimestamp(),
       };
-
+      Map<String, dynamic> allMessages = {
+        "senderId": FirebaseAuth.instance.currentUser!.uid,
+        "senderName": senderName,
+        "recieverId": recieverId,
+        "img": imgUrl,
+        "message": _message.text,
+        "time": FieldValue.serverTimestamp(),
+      };
       await FirebaseFirestore.instance
           .collection('chatroom')
           .doc(chatRoomId)
           .collection('chats')
           .add(messages);
+
+      await FirebaseFirestore.instance.collection('allChats').add(allMessages);
       _message.clear();
     } else {
       print('Please enter some text');

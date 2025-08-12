@@ -91,6 +91,16 @@ class _ProfileSettingsState extends State<ProfileSettings> {
         "profileImageUrl": profileImageUrl ?? "",
         "coverImageUrl": coverImageUrl ?? "",
       });
+
+      await FirebaseFirestore.instance
+          .collection('curentUser')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection('user')
+          .add({
+            "userId": FirebaseAuth.instance.currentUser!.uid,
+            "name": _titleController.text.trim(),
+            "profileImageUrl": profileImageUrl ?? "",
+          });
     } catch (e) {
       print(e);
     }
