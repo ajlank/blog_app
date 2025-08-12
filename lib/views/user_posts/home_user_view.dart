@@ -4,6 +4,7 @@ import 'package:blog_app/controller/notification_notifier.dart';
 import 'package:blog_app/controller/profile_settings_notifier.dart';
 import 'package:blog_app/customs/custom_clipper.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
+import 'package:blog_app/views/chat/chat_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
@@ -15,6 +16,14 @@ class HomeUserView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String getChatId(String uid1, String uid2) {
+      if (uid1.compareTo(uid2) > 0) {
+        return '$uid2\_$uid1';
+      } else {
+        return '$uid1\_$uid2';
+      }
+    }
+
     Future<int> getUserPostCount(String userId) async {
       final snapshot = await FirebaseFirestore.instance
           .collection('posts')
@@ -521,9 +530,23 @@ class HomeUserView extends StatelessWidget {
                                 FirebaseAuth.instance.currentUser!.uid)
                             ? GestureDetector(
                                 onTap: () {
-                                  Navigator.of(
-                                    context,
-                                  ).pushNamed(chatViewRoute);
+                                  final chatRoomId = getChatId(
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                    profileData['userId'],
+                                  );
+
+                                  context
+                                      .read<HomeUserProfileNotifier>()
+                                      .setRecieverImage(
+                                        profileData['profileImageUrl'],
+                                      );
+
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          ChatView(chatRoomId: chatRoomId),
+                                    ),
+                                  );
                                 },
                                 child: Container(
                                   height: 40,

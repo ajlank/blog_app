@@ -1,3 +1,5 @@
+import 'package:blog_app/controller/auth_controller/auth_error_notifier.dart';
+import 'package:blog_app/controller/auth_controller/firebase_auth_notifier.dart';
 import 'package:blog_app/controller/home_post_notifier.dart';
 import 'package:blog_app/controller/home_user_profile_notifier.dart';
 import 'package:blog_app/controller/notification_notifier.dart';
@@ -41,6 +43,10 @@ void main() async {
         ChangeNotifierProvider(create: (context) => HomeUserProfileNotifier()),
         ChangeNotifierProvider(create: (context) => NotificationNotifier()),
         ChangeNotifierProvider(create: (context) => HomePostNotifier()),
+        ChangeNotifierProvider(create: (context) => AuthErrorNotifier()),
+        Provider(
+          create: (context) => FirebaseAuthNotifier(FirebaseAuth.instance),
+        ),
       ],
       child: MyApp(),
     ),
@@ -64,7 +70,7 @@ class MyApp extends StatelessWidget {
             return Text('Loading');
           }
           if (snapshot.data != null) {
-            return HomeView();
+            return ProfileView();
           }
           return LoginView();
         },
@@ -78,7 +84,6 @@ class MyApp extends StatelessWidget {
         homeRoute: (context) => HomeView(),
         homeUserRoute: (context) => HomeUserView(),
         notificationsRoute: (context) => UserNotification(),
-        chatViewRoute: (context) => ChatView(),
         updatePostRoute: (context) => UpdatePost(),
         followerViewRoute: (context) => FollowersView(),
         messagesRoute: (context) => MessagesView(),

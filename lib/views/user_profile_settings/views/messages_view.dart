@@ -44,8 +44,8 @@ class MessagesView extends StatelessWidget {
                   leading: CircleAvatar(
                     backgroundImage: NetworkImage(data['senderImg'] ?? ''),
                   ),
-                  title: Text(data['senderName']),
-                  subtitle: Text(data['senderMessage']),
+                  title: Text(data['senderName'] ?? ''),
+                  subtitle: Text(data['senderMessage'] ?? ''),
                   splashColor: const Color.fromARGB(255, 226, 221, 202),
                 );
               },

@@ -109,7 +109,6 @@ class _ChatWithSenderViewState extends State<ChatWithSenderView> {
                     itemCount: docs.length,
                     itemBuilder: (context, index) {
                       final data = docs[index].data();
-
                       return Column(
                         children: [
                           ListTile(

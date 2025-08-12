@@ -5,64 +5,28 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ChatView extends StatefulWidget {
-  const ChatView({super.key});
+class ChatView extends StatelessWidget {
+  ChatView({super.key, required this.chatRoomId});
 
-  @override
-  State<ChatView> createState() => _ChatViewState();
-}
+  final String chatRoomId;
+  final TextEditingController _message = TextEditingController();
 
-class _ChatViewState extends State<ChatView> {
-  late final TextEditingController _messageController;
-  late final TextEditingController _recieverMessageController;
-  @override
-  void initState() {
-    _messageController = TextEditingController();
-    _recieverMessageController = TextEditingController();
+  void onSendMessage() async {
+    if (_message.text.isNotEmpty) {
+      Map<String, dynamic> messages = {
+        "senderId": FirebaseAuth.instance.currentUser!.uid,
+        "message": _message.text,
+        "time": FieldValue.serverTimestamp(),
+      };
 
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _messageController.dispose();
-    _recieverMessageController.dispose();
-    super.dispose();
-  }
-
-  Future<void> sendMessageHandler() async {
-    try {
-      await FirebaseFirestore.instance.collection("UserChatting").add({
-        'senderId': FirebaseAuth.instance.currentUser!.uid,
-        'senderName': Provider.of<NotificationNotifier>(
-          context,
-          listen: false,
-        ).notifSenderName,
-        'senderImg': Provider.of<NotificationNotifier>(
-          context,
-          listen: false,
-        ).notifSenderImage,
-        'senderMessage': _messageController.text,
-        'recieverId': Provider.of<HomeUserProfileNotifier>(
-          context,
-          listen: false,
-        ).homeUserId,
-        "recieverName": Provider.of<HomeUserProfileNotifier>(
-          context,
-          listen: false,
-        ).homeUserName,
-        'recieverMessage': _recieverMessageController.text,
-        "IdsAsArray": FieldValue.arrayUnion([
-          FirebaseAuth.instance.currentUser!.uid,
-          Provider.of<HomeUserProfileNotifier>(
-            context,
-            listen: false,
-          ).homeUserId,
-        ]),
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-    } catch (e) {
-      print(e.toString());
+      await FirebaseFirestore.instance
+          .collection('chatroom')
+          .doc(chatRoomId)
+          .collection('chats')
+          .add(messages);
+      _message.clear();
+    } else {
+      print('Please enter some text');
     }
   }
 
@@ -87,8 +51,10 @@ class _ChatViewState extends State<ChatView> {
           Expanded(
             child: StreamBuilder(
               stream: FirebaseFirestore.instance
-                  .collection('UserChatting')
-                  .orderBy("createdAt", descending: false)
+                  .collection('chatroom')
+                  .doc(chatRoomId)
+                  .collection('chats')
+                  .orderBy('time', descending: false)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -98,34 +64,45 @@ class _ChatViewState extends State<ChatView> {
                   return Text('No data');
                 }
                 if (snapshot.hasData) {
-                  final docs = snapshot.data!.docs;
+                  final messages = snapshot.data!.docs;
 
                   return ListView.builder(
-                    itemCount: docs.length,
+                    reverse: false,
+                    itemCount: messages.length,
                     itemBuilder: (context, index) {
-                      final data = docs[index].data();
-                      return (data["senderId"] ==
-                                  FirebaseAuth.instance.currentUser!.uid &&
-                              (data["recieverId"] ==
-                                  context
-                                      .watch<HomeUserProfileNotifier>()
-                                      .homeUserId))
-                          ? Column(
-                              children: [
-                                ListTile(
-                                  title: Text(
-                                    data['recieverMessage'],
-                                    style: TextStyle(fontSize: 13.2),
-                                  ),
-
-                                  trailing: Text(
-                                    data['senderMessage'],
-                                    style: TextStyle(fontSize: 13.2),
-                                  ),
-                                ),
-                              ],
-                            )
-                          : SizedBox.shrink();
+                      final msg = messages[index];
+                      bool isMe =
+                          msg['senderId'] ==
+                          FirebaseAuth.instance.currentUser!.uid;
+                      return Align(
+                        alignment: isMe
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 12,
+                          ),
+                          margin: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isMe ? Color(0xFF0084FF) : Color(0xFFE4E6EB),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(15),
+                              bottomRight: Radius.circular(15),
+                            ),
+                          ),
+                          child: Text(
+                            msg['message'],
+                            style: TextStyle(
+                              color: isMe ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      );
                     },
                   );
                 }
@@ -136,25 +113,12 @@ class _ChatViewState extends State<ChatView> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
-              controller:
-                  (FirebaseAuth.instance.currentUser!.uid ==
-                      context.watch<HomeUserProfileNotifier>().homeUserId)
-                  ? _recieverMessageController
-                  : _messageController,
+              controller: _message,
               decoration: InputDecoration(
-                hintText:
-                    (FirebaseAuth.instance.currentUser!.uid ==
-                        context.watch<HomeUserProfileNotifier>().homeUserId)
-                    ? 'Write your message as receiver'
-                    : 'Write your message as sender',
+                hintText: 'Write your message',
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
-                  onPressed: () async {
-                    await sendMessageHandler();
-                    FocusScope.of(context).unfocus(); // dismiss keyboard
-                    _recieverMessageController.clear();
-                    _messageController.clear();
-                  },
+                  onPressed: onSendMessage,
                   icon: const Icon(Icons.send, color: Colors.blue),
                 ),
               ),

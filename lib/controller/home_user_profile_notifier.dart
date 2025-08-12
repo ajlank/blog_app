@@ -9,9 +9,15 @@ class HomeUserProfileNotifier with ChangeNotifier {
   String _currentUserName = '';
   String _senderName = '';
   String _senderId = '';
+  String _recieverImg = '';
 
   void setHomeUserId(String id) {
     _homeUserId = id;
+    notifyListeners();
+  }
+
+  void setRecieverImage(String url) {
+    _recieverImg = url;
     notifyListeners();
   }
 
@@ -55,4 +61,5 @@ class HomeUserProfileNotifier with ChangeNotifier {
   String get currentUserName => _currentUserName;
   String get senderName => _senderName;
   String get senderId => _senderId;
+  String get recieverImg => _recieverImg;
 }

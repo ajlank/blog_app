@@ -1,8 +1,9 @@
-import 'package:blog_app/controller/notification_notifier.dart';
+import 'package:blog_app/base/styles/text_styles.dart';
+import 'package:blog_app/controller/auth_controller/auth_error_notifier.dart';
+import 'package:blog_app/controller/auth_controller/firebase_auth_notifier.dart';
+import 'package:blog_app/generics/loading_sc_dialog.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
@@ -30,60 +31,102 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
-  Future<void> loginUser() async {
-    try {
-      final userCred = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-      if (userCred.user != null) {
-        context.read<NotificationNotifier>().setNotifRecieverId(
-          userCred.user!.uid,
-        );
-        Navigator.of(
-          context,
-        ).pushNamedAndRemoveUntil(profileRoute, (_) => false);
-      }
-    } on FirebaseAuthException catch (e) {
-      print(e.message);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final userConfirmed = GetStorage().read("userConfirmId");
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Login'),
-            TextField(
-              keyboardType: TextInputType.emailAddress,
-              controller: _emailController,
-              decoration: InputDecoration(hintText: 'Enter your email'),
+        child: Center(
+          child: Container(
+            decoration: BoxDecoration(boxShadow: []),
+            height: size.height * .44,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Login', style: TextStyles.profileHeaderText),
+
+                SizedBox(height: 25),
+                TextField(
+                  keyboardType: TextInputType.emailAddress,
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter your email',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 15),
+                TextField(
+                  keyboardType: TextInputType.text,
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter your password',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                ),
+                (context.watch<AuthErrorNotifier>().passwordError.isNotEmpty)
+                    ? Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12, top: 5),
+                            child: Text(
+                              context.watch<AuthErrorNotifier>().passwordError,
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : SizedBox(height: 12),
+                SizedBox(height: 12),
+                Container(
+                  width: size.width * .60,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 136, 196, 212),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: TextButton(
+                    onPressed: () async {
+                      showLoadingScreen(context);
+                      try {
+                        await context.read<FirebaseAuthNotifier>().loginUser(
+                          _emailController.text.trim(),
+                          _passwordController.text.trim(),
+                          context,
+                        );
+                      } finally {
+                        Navigator.of(context).pop();
+                      }
+                      Navigator.of(
+                        context,
+                      ).pushNamedAndRemoveUntil(profileRoute, (_) => false);
+                    },
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(color: Colors.white, fontSize: 19),
+                    ),
+                  ),
+                ),
+
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(
+                      context,
+                    ).pushNamedAndRemoveUntil(signUpRoute, (route) => false);
+                  },
+                  child: const Text('Not registered yet? register here'),
+                ),
+              ],
             ),
-            TextField(
-              keyboardType: TextInputType.text,
-              controller: _passwordController,
-              decoration: InputDecoration(hintText: 'Enter your password'),
-            ),
-            TextButton(
-              onPressed: () async {
-                await loginUser();
-              },
-              child: const Text('Login'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(
-                  context,
-                ).pushNamedAndRemoveUntil(signUpRoute, (route) => false);
-              },
-              child: const Text('Not registered yet? register here'),
-            ),
-          ],
+          ),
         ),
       ),
     );
