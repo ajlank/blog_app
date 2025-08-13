@@ -97,7 +97,9 @@ class _CreatePostState extends State<CreatePost> {
         // Optional: fetch from Firestore fallback
         return;
       }
-      final postDoc = FirebaseFirestore.instance.collection("posts").doc();
+      final postDoc = FirebaseFirestore.instance
+          .collection("posts")
+          .doc(FirebaseAuth.instance.currentUser!.uid);
 
       await postDoc.set({
         "documentId": postDoc.id,

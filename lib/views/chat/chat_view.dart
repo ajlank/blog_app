@@ -1,5 +1,4 @@
 import 'package:blog_app/controller/home_user_profile_notifier.dart';
-import 'package:blog_app/controller/notification_notifier.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +34,7 @@ class ChatView extends StatelessWidget {
         "recieverId": recieverId,
         "img": imgUrl,
         "message": _message.text,
+        "roomId": chatRoomId,
         "time": FieldValue.serverTimestamp(),
       };
       await FirebaseFirestore.instance

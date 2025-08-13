@@ -1,9 +1,8 @@
 import 'package:blog_app/controller/home_user_profile_notifier.dart';
-import 'package:blog_app/utils/constants/app_routes.dart';
+import 'package:blog_app/views/chat/chat_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
 class MessagesView extends StatelessWidget {
@@ -27,6 +26,7 @@ class MessagesView extends StatelessWidget {
           }
           if (snapshot.hasData) {
             final docs = snapshot.data!.docs;
+
             return ListView.builder(
               itemCount: docs.length,
               itemBuilder: (context, index) {
@@ -34,13 +34,19 @@ class MessagesView extends StatelessWidget {
 
                 return ListTile(
                   onTap: () {
-                    context
-                        .read<HomeUserProfileNotifier>()
-                        .setAllMessageSpecificUserId(data['senderId']);
-                    // context.read<HomeUserProfileNotifier>().setSenderName(
-                    //   data['senderName'],
-                    // );
-                    // Navigator.of(context).pushNamed(chatWithSenderRoute);
+                    context.read<HomeUserProfileNotifier>().setHomeUserName(
+                      data['senderName'],
+                    );
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => ChatView(
+                          chatRoomId: data['roomId'],
+                          senderName: data['senderName'],
+                          imgUrl: data['img'],
+                          recieverId: FirebaseAuth.instance.currentUser!.uid,
+                        ),
+                      ),
+                    );
                   },
                   leading: CircleAvatar(
                     backgroundImage: NetworkImage(data['img'] ?? ''),

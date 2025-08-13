@@ -1,6 +1,7 @@
 final String loginRoute = '/logIn';
 final String signUpRoute = '/signUp';
 final String profileRoute = '/profileRoute';
+final String profileUpdateRoute = '/profileUpdate';
 final String profileSettingsRoute = '/profileSettings';
 final String createPostRoute = '/createPost';
 final String homeRoute = '/homeRoute';
@@ -11,3 +12,4 @@ final String updatePostRoute = '/updatePostRoute';
 final String followerViewRoute = '/followerView';
 final String messagesRoute = '/messagesView';
 final String chatWithSenderRoute = '/chatWithSenderRoute';
+final String postCommentNotificationRoute = '/pcRoute';

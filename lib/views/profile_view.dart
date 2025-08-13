@@ -7,7 +7,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
 class ProfileView extends StatelessWidget {
@@ -66,6 +65,8 @@ class ProfileView extends StatelessWidget {
           }
           if (snapshot.hasData) {
             final docs = snapshot.data!.docs;
+            final docId = docs.first.id;
+
             final profileData = docs.first.data();
             context.read<ProfileSettingsNotifier>().setUserDetals(
               profileData['profileImageUrl'],
@@ -132,9 +133,10 @@ class ProfileView extends StatelessWidget {
 
                               GestureDetector(
                                 onTap: () {
-                                  Navigator.of(
-                                    context,
-                                  ).pushNamed(profileSettingsRoute);
+                                  Navigator.of(context).pushNamed(
+                                    profileUpdateRoute,
+                                    arguments: {'docId': docId},
+                                  );
                                 },
                                 child: Container(
                                   padding: EdgeInsets.all(3),

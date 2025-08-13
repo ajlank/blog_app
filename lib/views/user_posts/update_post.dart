@@ -6,6 +6,7 @@ import 'package:blog_app/utils/constants/app_routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
@@ -133,6 +134,7 @@ class _UpdatePostState extends State<UpdatePost> {
 
   @override
   Widget build(BuildContext context) {
+    print(GetStorage().read('me+${FirebaseAuth.instance.currentUser!.uid}'));
     return Scaffold(
       appBar: AppBar(),
       body: Column(

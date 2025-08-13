@@ -9,14 +9,15 @@ import 'package:blog_app/firebase_options.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
 import 'package:blog_app/views/auth_views/login_view.dart';
 import 'package:blog_app/views/auth_views/sign_up.dart';
-import 'package:blog_app/views/chat/chat_view.dart';
 import 'package:blog_app/views/home_view.dart';
 import 'package:blog_app/views/notifications/user_notification.dart';
+import 'package:blog_app/views/notifications/user_post_comment_notification.dart';
 import 'package:blog_app/views/profile_view.dart';
 import 'package:blog_app/views/user_profile_settings/profile_settings.dart';
 import 'package:blog_app/views/user_posts/create_post.dart';
 import 'package:blog_app/views/user_posts/home_user_view.dart';
 import 'package:blog_app/views/user_posts/update_post.dart';
+import 'package:blog_app/views/user_profile_settings/profile_update.dart';
 import 'package:blog_app/views/user_profile_settings/views/chat_with_sender_view.dart';
 import 'package:blog_app/views/user_profile_settings/views/followers_view.dart';
 import 'package:blog_app/views/user_profile_settings/views/messages_view.dart';
@@ -59,7 +60,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Blog App',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
       ),
@@ -88,6 +89,9 @@ class MyApp extends StatelessWidget {
         followerViewRoute: (context) => FollowersView(),
         messagesRoute: (context) => MessagesView(),
         chatWithSenderRoute: (context) => ChatWithSenderView(),
+        postCommentNotificationRoute: (context) =>
+            UserPostCommentNotification(),
+        profileUpdateRoute: (context) => ProfileUpdate(),
       },
     );
   }

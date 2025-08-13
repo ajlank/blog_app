@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
@@ -25,6 +26,12 @@ class HomeView extends StatelessWidget {
         backgroundColor: Colors.white,
         actionsPadding: EdgeInsets.all(12),
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(postCommentNotificationRoute);
+            },
+            icon: Icon(Icons.podcasts_sharp),
+          ),
           IconButton(
             onPressed: () {
               Navigator.of(context).pushNamed(notificationsRoute);
@@ -61,6 +68,10 @@ class HomeView extends StatelessWidget {
           }
           if (snapshot.hasData) {
             final docs = snapshot.data!.docs;
+            GetStorage().write(
+              'me+${FirebaseAuth.instance.currentUser!.uid}',
+              docs.first.id,
+            );
 
             return ListView.builder(
               padding: const EdgeInsets.all(12),
@@ -237,6 +248,30 @@ class HomeView extends StatelessWidget {
                                             'likeCount': FieldValue.increment(
                                               1,
                                             ),
+                                          });
+                                      await FirebaseFirestore.instance
+                                          .collection(
+                                            'postReactionCommentNotification',
+                                          )
+                                          .add({
+                                            "notifSenderId": FirebaseAuth
+                                                .instance
+                                                .currentUser!
+                                                .uid,
+                                            "notifRecieverId":
+                                                postData['userId'],
+                                            "notifSenderImg":
+                                                Provider.of<
+                                                      NotificationNotifier
+                                                    >(context, listen: false)
+                                                    .notifSenderImage,
+                                            "notifSenderName":
+                                                Provider.of<
+                                                      NotificationNotifier
+                                                    >(context, listen: false)
+                                                    .notifSenderName,
+                                            "createdAt":
+                                                FieldValue.serverTimestamp(),
                                           });
                                     }
                                   },
