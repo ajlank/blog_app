@@ -40,6 +40,7 @@ class _UserPostCommentNotificationState
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('postReactionCommentNotification')
+            .orderBy('createdAt', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

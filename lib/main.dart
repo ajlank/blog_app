@@ -9,6 +9,7 @@ import 'package:blog_app/firebase_options.dart';
 import 'package:blog_app/utils/constants/app_routes.dart';
 import 'package:blog_app/views/auth_views/login_view.dart';
 import 'package:blog_app/views/auth_views/sign_up.dart';
+import 'package:blog_app/views/chat/global_chat_view.dart';
 import 'package:blog_app/views/home_view.dart';
 import 'package:blog_app/views/notifications/user_notification.dart';
 import 'package:blog_app/views/notifications/user_post_comment_notification.dart';
@@ -92,6 +93,7 @@ class MyApp extends StatelessWidget {
         postCommentNotificationRoute: (context) =>
             UserPostCommentNotification(),
         profileUpdateRoute: (context) => ProfileUpdate(),
+        globalChatRoute: (context) => GlobalChatView(),
       },
     );
   }

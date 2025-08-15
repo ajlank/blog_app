@@ -13,3 +13,4 @@ final String followerViewRoute = '/followerView';
 final String messagesRoute = '/messagesView';
 final String chatWithSenderRoute = '/chatWithSenderRoute';
 final String postCommentNotificationRoute = '/pcRoute';
+final String globalChatRoute = '/globalChatRoute';

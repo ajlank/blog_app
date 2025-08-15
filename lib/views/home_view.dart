@@ -28,6 +28,12 @@ class HomeView extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
+              Navigator.of(context).pushNamed(globalChatRoute);
+            },
+            icon: Icon(Icons.chat),
+          ),
+          IconButton(
+            onPressed: () {
               Navigator.of(context).pushNamed(postCommentNotificationRoute);
             },
             icon: Icon(Icons.podcasts_sharp),
@@ -68,10 +74,6 @@ class HomeView extends StatelessWidget {
           }
           if (snapshot.hasData) {
             final docs = snapshot.data!.docs;
-            GetStorage().write(
-              'me+${FirebaseAuth.instance.currentUser!.uid}',
-              docs.first.id,
-            );
 
             return ListView.builder(
               padding: const EdgeInsets.all(12),
