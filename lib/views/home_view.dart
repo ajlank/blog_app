@@ -9,17 +9,45 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 enum MenuAction { delete, update }
 
-class HomeView extends StatelessWidget {
+class HomeView extends HookWidget {
   const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final future = useMemoized(
+      () => FirebaseFirestore.instance
+          .collection('profilesettings')
+          .where('userId', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          .get(),
+    );
+
+    final future2 = useMemoized(
+      () => FirebaseFirestore.instance
+          .collection('postReactionCommentNotification')
+          .where(
+            'notifRecieverId',
+            isEqualTo: FirebaseAuth.instance.currentUser!.uid,
+          )
+          .get(),
+    );
+    final future3 = useMemoized(
+      () => FirebaseFirestore.instance.collection('globalChatroom').get(),
+    );
+
+    final result = useFuture(future);
+    final followCount = result.data!.docs[0].data()['followCount'];
+
+    final result2 = useFuture(future2);
+    final prcCount = result2.data!.docs.length;
+
+    final result3 = useFuture(future3);
+    final globalChatCount = result3.data!.docs.length;
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 225, 227, 230),
       appBar: AppBar(
@@ -30,19 +58,28 @@ class HomeView extends StatelessWidget {
             onPressed: () {
               Navigator.of(context).pushNamed(globalChatRoute);
             },
-            icon: Icon(Icons.chat),
+            icon: Badge(
+              label: Text(globalChatCount.toString()),
+              child: Icon(Icons.chat),
+            ),
           ),
           IconButton(
             onPressed: () {
               Navigator.of(context).pushNamed(postCommentNotificationRoute);
             },
-            icon: Icon(Icons.podcasts_sharp),
+            icon: Badge(
+              label: Text(prcCount.toString()),
+              child: Icon(Icons.podcasts_sharp),
+            ),
           ),
           IconButton(
             onPressed: () {
               Navigator.of(context).pushNamed(notificationsRoute);
             },
-            icon: Icon(Icons.notifications_active),
+            icon: Badge(
+              label: Text(followCount.toString()),
+              child: Icon(Icons.notifications_active),
+            ),
           ),
           IconButton(
             onPressed: () {

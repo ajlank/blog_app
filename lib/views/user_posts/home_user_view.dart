@@ -492,6 +492,8 @@ class HomeUserView extends StatelessWidget {
                                                 context,
                                                 listen: false,
                                               ).notifSenderName,
+                                          "followingCount":
+                                              FieldValue.increment(0),
                                           "createdAt":
                                               FieldValue.serverTimestamp(),
                                         });
