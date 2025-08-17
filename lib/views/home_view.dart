@@ -24,7 +24,7 @@ class HomeView extends HookWidget {
       () => FirebaseFirestore.instance
           .collection('profilesettings')
           .where('userId', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-          .get(),
+          .snapshots(),
     );
 
     final future2 = useMemoized(
@@ -34,19 +34,19 @@ class HomeView extends HookWidget {
             'notifRecieverId',
             isEqualTo: FirebaseAuth.instance.currentUser!.uid,
           )
-          .get(),
+          .snapshots(),
     );
     final future3 = useMemoized(
-      () => FirebaseFirestore.instance.collection('globalChatroom').get(),
+      () => FirebaseFirestore.instance.collection('globalChatroom').snapshots(),
     );
 
-    final result = useFuture(future);
+    final result = useStream(future);
     final followCount = result.data!.docs[0].data()['followCount'];
 
-    final result2 = useFuture(future2);
+    final result2 = useStream(future2);
     final prcCount = result2.data!.docs.length;
 
-    final result3 = useFuture(future3);
+    final result3 = useStream(future3);
     final globalChatCount = result3.data!.docs.length;
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 225, 227, 230),
