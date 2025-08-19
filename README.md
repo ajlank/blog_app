@@ -36,7 +36,7 @@ Alhamdulillah, this is a fully functional **Blog App** built using **Flutter** a
 
 <p align="center">
   <img src="lib/assets/appUi/allFollowers.png" alt="UI Screen 4" width="200"/>
-  <img src="lib/assets/appUi/AllMessages.png" alt="UI Screen 5" width="200"/>
+  <img src="lib/assets/appUi/AllMessage.png" alt="UI Screen 5" width="200"/>
   <img src="lib/assets/appUi/home.png" alt="UI Screen 6" width="200"/>
   <img src="lib/assets/appUi/comment.png" alt="UI Screen 6" width="200"/>
 </p>
