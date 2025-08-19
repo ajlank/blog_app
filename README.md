@@ -29,8 +29,11 @@ Alhamdulillah, this is a fully functional **Blog App** built using **Flutter** a
 ## 📸 App UI Preview
 
 <p align="center">
+  <h3>Login screen</h3>
   <img src="lib/assets/appUi/login.png" alt="UI Screen 1" width="200"/>
+  <h3>Register screen</h3>
   <img src="lib/assets/appUi/register.png" alt="UI Screen 2" width="200"/>
+  <h3>Profile screen</h3>
   <img src="lib/assets/appUi/profile.png" alt="UI Screen 3" width="200"/>
 </p>
 
