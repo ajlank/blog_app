@@ -38,17 +38,26 @@ Alhamdulillah, this is a fully functional **Blog App** built using **Flutter** a
 </p>
 
 <p align="center">
+  <h3>All Followers</h3>
   <img src="lib/assets/appUi/allFollowers.png" alt="UI Screen 4" width="200"/>
+    <h3>All Messages</h3>
   <img src="lib/assets/appUi/AllMessage.png" alt="UI Screen 5" width="200"/>
+    <h3>Home Screen</h3>
   <img src="lib/assets/appUi/home.png" alt="UI Screen 6" width="200"/>
+    <h3>Post Comment</h3>
   <img src="lib/assets/appUi/comment.png" alt="UI Screen 6" width="200"/>
 </p>
 
 <p align="center">
+  <h3>Home User profile</h3>
   <img src="lib/assets/appUi/home_user_profile.png" alt="UI Screen 7" width="200"/>
+    <h3>One-to-One to chat</h3>
   <img src="lib/assets/appUi/one_to_one_chat.png" alt="UI Screen 7" width="200"/>
+    <h3>Global Chatroom</h3>
   <img src="lib/assets/appUi/global_chatroom.png" alt="UI Screen 7" width="200"/>
+    <h3>Reaction notification</h3>
   <img src="lib/assets/appUi/react_notif.png" alt="UI Screen 6" width="200"/>
+    <h3>Followers notification</h3>
   <img src="lib/assets/appUi/following_notif.png" alt="UI Screen 6" width="200"/>
 </p>
 
