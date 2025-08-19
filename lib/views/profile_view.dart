@@ -165,27 +165,27 @@ class ProfileView extends StatelessWidget {
                               ),
 
                               SizedBox(width: 30),
-                              GestureDetector(
-                                onTap: () async {},
-                                child: Container(
-                                  padding: EdgeInsets.all(3),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(15),
-                                    ),
-                                    border: Border.all(
-                                      color: const Color.fromARGB(
-                                        255,
-                                        142,
-                                        140,
-                                        140,
-                                      ),
-                                      width: 0.6,
-                                    ),
-                                  ),
-                                  child: Icon(Icons.settings),
-                                ),
-                              ),
+                              // GestureDetector(
+                              //   onTap: () async {},
+                              //   child: Container(
+                              //     padding: EdgeInsets.all(3),
+                              //     decoration: BoxDecoration(
+                              //       borderRadius: BorderRadius.all(
+                              //         Radius.circular(15),
+                              //       ),
+                              //       border: Border.all(
+                              //         color: const Color.fromARGB(
+                              //           255,
+                              //           142,
+                              //           140,
+                              //           140,
+                              //         ),
+                              //         width: 0.6,
+                              //       ),
+                              //     ),
+                              //     child: Icon(Icons.settings),
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),

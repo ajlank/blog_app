@@ -119,49 +119,48 @@ class HomeUserView extends StatelessWidget {
                         Container(
                           child: Row(
                             children: [
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.of(
-                                    context,
-                                  ).pushNamed(createPostRoute);
-                                },
-                                icon: Icon(FluentIcons.add_16_regular),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.of(context).pushNamedAndRemoveUntil(
-                                    homeRoute,
-                                    (_) => false,
-                                  );
-                                },
-                                icon: Icon(FluentIcons.home_12_regular),
-                              ),
-
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(
-                                    context,
-                                  ).pushNamed(profileSettingsRoute);
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(3),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(15),
-                                    ),
-                                    border: Border.all(
-                                      color: const Color.fromARGB(
-                                        255,
-                                        142,
-                                        140,
-                                        140,
-                                      ),
-                                    ),
-                                  ),
-                                  child: Icon(Icons.settings),
-                                ),
-                              ),
-                              SizedBox(width: 30),
+                              // IconButton(
+                              //   onPressed: () {
+                              //     Navigator.of(
+                              //       context,
+                              //     ).pushNamed(createPostRoute);
+                              //   },
+                              //   icon: Icon(FluentIcons.add_16_regular),
+                              // ),
+                              // IconButton(
+                              //   onPressed: () {
+                              //     Navigator.of(context).pushNamedAndRemoveUntil(
+                              //       homeRoute,
+                              //       (_) => false,
+                              //     );
+                              //   },
+                              //   icon: Icon(FluentIcons.home_12_regular),
+                              // ),
+                              // GestureDetector(
+                              //   onTap: () {
+                              //     Navigator.of(
+                              //       context,
+                              //     ).pushNamed(profileSettingsRoute);
+                              //   },
+                              //   child: Container(
+                              //     padding: EdgeInsets.all(3),
+                              //     decoration: BoxDecoration(
+                              //       borderRadius: BorderRadius.all(
+                              //         Radius.circular(15),
+                              //       ),
+                              //       border: Border.all(
+                              //         color: const Color.fromARGB(
+                              //           255,
+                              //           142,
+                              //           140,
+                              //           140,
+                              //         ),
+                              //       ),
+                              //     ),
+                              //     child: Icon(Icons.settings),
+                              //   ),
+                              // ),
+                              // SizedBox(width: 30),
                               CircleAvatar(
                                 radius: 50,
                                 backgroundImage: NetworkImage(
@@ -169,32 +168,32 @@ class HomeUserView extends StatelessWidget {
                                 ),
                               ),
 
-                              SizedBox(width: 30),
-                              GestureDetector(
-                                onTap: () async {},
-                                child: Container(
-                                  padding: EdgeInsets.all(3),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(15),
-                                    ),
-                                    border: Border.all(
-                                      color: const Color.fromARGB(
-                                        255,
-                                        142,
-                                        140,
-                                        140,
-                                      ),
-                                      width: 0.6,
-                                    ),
-                                  ),
-                                  child: Icon(Icons.settings),
-                                ),
-                              ),
+                              // SizedBox(width: 30),
+                              // GestureDetector(
+                              //   onTap: () async {},
+                              //   child: Container(
+                              //     padding: EdgeInsets.all(3),
+                              //     decoration: BoxDecoration(
+                              //       borderRadius: BorderRadius.all(
+                              //         Radius.circular(15),
+                              //       ),
+                              //       border: Border.all(
+                              //         color: const Color.fromARGB(
+                              //           255,
+                              //           142,
+                              //           140,
+                              //           140,
+                              //         ),
+                              //         width: 0.6,
+                              //       ),
+                              //     ),
+                              //     child: Icon(Icons.settings),
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),
-                        SizedBox(width: 50),
+                        // SizedBox(width: 50),
                       ],
                     ),
                   ),
