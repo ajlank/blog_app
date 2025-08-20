@@ -15,6 +15,7 @@ Alhamdulillah, this is a fully functional **Blog App** built using **Flutter** a
 
 ### Home View
 - Create and view posts.
+- Update and delete posts.
 - View other users' posts.
 - Comment and react (love) on posts.
 - Visit other users' profiles.
